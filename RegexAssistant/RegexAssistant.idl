@@ -1,0 +1,29 @@
+// RegexAssistant.idl : type library source for RegexAssistant.exe
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (RegexAssistant.tlb).
+
+[ uuid(99709d1c-796f-42cf-8a28-0d691011d557), version(1.0) ]
+library RegexAssistant
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	//  Primary dispatch interface for CRegexAssistantDoc
+
+	[ uuid(1b0815f4-8a77-436b-b931-ed3d53ff6a48) ]
+	dispinterface IRegexAssistant
+	{
+		properties:
+
+		methods:
+	};
+
+	//  Class information for CRegexAssistantDoc
+
+	[ uuid(4422cfd8-7470-47ad-ae16-4b1fd8219fff) ]
+	coclass RegexAssistant
+	{
+		[default] dispinterface IRegexAssistant;
+	};
+};

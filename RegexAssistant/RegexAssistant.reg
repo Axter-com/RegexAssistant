@@ -1,0 +1,17 @@
+REGEDIT
+; This .REG file may be used by your SETUP program.
+;   If a SETUP program is not available, the entries below will be
+;   registered in your InitInstance automatically with a call to
+;   CWinApp::RegisterShellFileTypes and COleObjectFactory::UpdateRegistryAll.
+
+
+HKEY_CLASSES_ROOT\RegexAssistant.Application = RegexAssistant Application
+
+
+HKEY_CLASSES_ROOT\RegexAssistant.Application\CLSID = {4422cfd8-7470-47ad-ae16-4b1fd8219fff}
+
+HKEY_CLASSES_ROOT\CLSID\{4422cfd8-7470-47ad-ae16-4b1fd8219fff} = RegexAssistant Application
+HKEY_CLASSES_ROOT\CLSID\{4422cfd8-7470-47ad-ae16-4b1fd8219fff}\ProgId = RegexAssistant.Application
+
+
+HKEY_CLASSES_ROOT\CLSID\{4422cfd8-7470-47ad-ae16-4b1fd8219fff}\LocalServer32 = RegexAssistant.EXE
