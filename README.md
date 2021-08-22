@@ -1,15 +1,17 @@
+# RegexAssistant
 [![logo](Docs/Logos/RegexAssitant_Logo.png)](https://github.com/David-Maisonave/RegexAssistant)
-
-# RegexAssistant Source Code
 [![All Releases](https://img.shields.io/github/downloads/David-Maisonave/RegexAssistant/total.svg)](https://github.com/David-Maisonave/RegexAssistant/releases/latest)
-
 
 RegexAssistant is an open source Regular Expression (Regex) tool for Windows. 
 RegexAssistant has an easy to use GUI that can build and test regex. As the user types the expression, the results can be seen instantaneously.
+It has a cheatsheet token window which list the main regex tokens and common patterns.
 
 ## Downloads
 Use the following link to download the latest release binaries: [Download](https://github.com/David-Maisonave/RegexAssistant/releases/tag/0.1)
 
+[alt tag](https://github.com/David-Maisonave/RegexAssistant/Docs/ProjectImages/RegexAssistant_DefaultStartupScreen.png)
+
+# RegexAssistant Source Code
 ## Requirements
 
 ### Visual Studio 2017
