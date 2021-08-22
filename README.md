@@ -9,7 +9,7 @@ It has a cheatsheet token window which list the main regex tokens and common pat
 ## Downloads
 Use the following link to download the latest release binaries: [Download](https://github.com/David-Maisonave/RegexAssistant/releases/tag/0.1)
 
-[alt tag](https://raw.githubusercontent.com/David-Maisonave/RegexAssistant/main/Docs/ProjectImages/RegexAssistant_DefaultStartupScreen.png)
+[![Screenshot1](Docs/ProjectImages/RegexAssistant_DefaultStartupScreen.png)](https://github.com/David-Maisonave/RegexAssistant)
 
 # RegexAssistant Source Code
 ## Requirements
