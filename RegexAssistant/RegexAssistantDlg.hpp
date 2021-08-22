@@ -88,7 +88,7 @@ const CString CRegexAssistantDlg::InsertItemsList[] =
 const int CRegexAssistantDlg::QtyColumnsInLinst = 4;
 const int CRegexAssistantDlg::MaxInsertItemsList = ((sizeof( InsertItemsList ) / sizeof( InsertItemsList[0] ))) / QtyColumnsInLinst;
 const CString CRegexAssistantDlg::m_DefaultTestTargetTextData = _T( "\
-Paste your sample text here. The text here becomes highlighted when it matches Regex code (Expression Field). By default this program starts up with the [Sample] and [Expression] fields prepopulated, to help the user quickly learn by example.\r\n\
+Paste your sample text here. The text here becomes highlighted when it matches Regex code (Expression Field). By default this program starts up with the [Sample] and [Expression] fields populated, to help the user quickly learn by example.\r\n\
 Here is an exercise to get more familiar with the program interface.\r\n\
 1. Delete Expression field, and leave the default content in the sample field.\r\n\
 2. Type foo		While typing, notice what is getting highlighted in the sample field.\r\n\
@@ -100,18 +100,16 @@ foolhardier\r\n\
 foolery frog beach cake foothill run fish foul ball film star flight footlights space footstools\r\n\
 Footnotes said the footdraggers took footage of a foolish footman as he foozled the putt playing golf in a football field\r\n\
 David posted file c:\\foothill.doc to site http://www.foodie.com and put a copy in the footlocker\r\n\
-David Maisonave plays football better then foosball, but he is footloose in zip code 08015-6912\r\n\
+David Maisonave plays football better then Foosball, but he is footloose in zip code 08015-6912\r\n\
 The IP address 10.165.132.95 comes from a 19133 zip code area, which is where 800-969-2030 and 555.345.1200 is located.\r\n\
-c:\\film.txt          foozles\r\n\
+c:\\film.txt          foozle\r\n\
 footlights           David\r\n\
 foodie               Friday\r\n\
 More test text below......\r\n\
 /sub/subsub/subsubsub/footsteps/footlocker.cvf\r\n\
-footlights           footholds\r\n\
-foodie               foozles\r\n\
 732-123-4567         http://foolhardy.com\r\n\
 http://axter.com     732-987-6543\r\n\
-800-888-8933         ftp://foofaraw.com\r\n\
+800-888-8933         ftp://foozled.com\r\n\
 1-800-325-9345       http://footloose.net\r\n\
 10.0.0.123           134-42-0156\r\n\
 459-78-2390          10.0.0.101 \r\n\
