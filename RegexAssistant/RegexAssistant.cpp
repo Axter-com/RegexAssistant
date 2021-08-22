@@ -4,7 +4,6 @@
 
 #include "pch.h"
 #include "framework.h"
-#include "RegexAssistant.h"
 #include "RegexAssistantDlg.h"
 #include "cxxopts.hpp"
 #include <string>
@@ -48,6 +47,23 @@ BOOL CRegexAssistantApp::InitInstance()
 	CShellManager *pShellManager = new CShellManager;
 	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows));
 	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
+	CCommandLineInfo cmdInfo;
+	ParseCommandLine( cmdInfo );
+	if ( cmdInfo.m_bRunEmbedded || cmdInfo.m_bRunAutomated )
+	{
+		COleTemplateServer::RegisterAll();
+	} else if ( cmdInfo.m_nShellCommand == CCommandLineInfo::AppUnregister )
+	{
+		COleObjectFactory::UpdateRegistryAll( FALSE );
+		AfxOleUnregisterTypeLib( _tlid, _wVerMajor, _wVerMinor );
+		return FALSE;
+	} else
+	{
+		COleObjectFactory::UpdateRegistryAll();
+		AfxOleRegisterTypeLib( AfxGetInstanceHandle(), _tlid );
+		if ( cmdInfo.m_nShellCommand == CCommandLineInfo::AppRegister )
+			return FALSE;
+	}
 
 	cxxopts::Options options( "RegexAssistant", "**********  Regular Expression (Regex) Assistant  **********" );
 	options.allow_unrecognised_options()
@@ -56,11 +72,12 @@ BOOL CRegexAssistantApp::InitInstance()
 		("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value( "false" ))
 		("h,help", "Print usage")
 		("m,monitor_no", "Monitor to start on", cxxopts::value<int>()->default_value("0"), "N")
-		("r,regex", "Regular Expression (Regex) to populate field", cxxopts::value<string>()->default_value( "foo\\S*" ))
-		("q,regex_replace", "Name of language to export", cxxopts::value<string>()->default_value( "" ))
+		("x,regex", "Regular Expression (Regex) to populate field", cxxopts::value<string>()->default_value( "foo\\S*" ))
+		("r,regex_replace", "Name of language to export", cxxopts::value<string>()->default_value( "" ))
 		("s,sample_text", "Text to populated sample field", cxxopts::value<string>()->default_value( "" ))
 		("f,file", "Name of file to get content for sample field", cxxopts::value<string>()->default_value( "" ))
 		("c,clipboard", "Populate sample field with content from clipboard", cxxopts::value<bool>()->default_value( "false" ), "bool")
+		("t,compatibility", "Regex compatibility target.", cxxopts::value<string>()->default_value( "" ))
 		;
 	auto arg_result = options.parse( __argc, __wargv );
 	
@@ -77,6 +94,7 @@ BOOL CRegexAssistantApp::InitInstance()
 	int MonitorToDisplay = arg_result["monitor_no"].as<int>();
 	CString SampleFileName = FXString::ToWString( arg_result["file"].as<string>() ).c_str();
 	bool ClipboardSampleLoad = arg_result["clipboard"].as<bool>();
+	Regex_Compatibility regex_compatibility = REGEX_COMPATIBILITY_SCINTILLA_POSIX;
 
 	if ( ClipboardSampleLoad )
 		sampleloadmethod = SampleLoadMethod::SampleLoadFromClipboard;
@@ -90,29 +108,7 @@ BOOL CRegexAssistantApp::InitInstance()
 		sampleloadmethod = SampleLoadMethod::SampleLoadFromCommandLine;
 	}
 
-	CCommandLineInfo cmdInfo;
-	ParseCommandLine( cmdInfo );
-	if ( cmdInfo.m_bRunEmbedded || cmdInfo.m_bRunAutomated )
-	{
-		COleTemplateServer::RegisterAll();
-	}
-	else if ( cmdInfo.m_nShellCommand == CCommandLineInfo::AppUnregister )
-	{
-		COleObjectFactory::UpdateRegistryAll( FALSE );
-		AfxOleUnregisterTypeLib( _tlid, _wVerMajor, _wVerMinor );
-		return FALSE;
-	}
-	else
-	{
-		COleObjectFactory::UpdateRegistryAll();
-		AfxOleRegisterTypeLib( AfxGetInstanceHandle(), _tlid );
-		if ( cmdInfo.m_nShellCommand == CCommandLineInfo::AppRegister )
-			return FALSE;
-	}
-
-
-
-	CRegexAssistantDlg dlg( regex_search , regex_replace, Sample, sampleloadmethod, MonitorToDisplay);
+	CRegexAssistantDlg dlg( regex_search , regex_replace, Sample, sampleloadmethod, MonitorToDisplay, regex_compatibility );
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)	{

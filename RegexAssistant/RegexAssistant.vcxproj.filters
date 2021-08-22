@@ -63,6 +63,9 @@
     <ClInclude Include="cxxopts.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RegexAssistantDlg.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RegexAssistant.cpp">
@@ -109,6 +112,8 @@
     <None Include="res\RegexAssistant.rc2">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\README.md" />
+    <None Include="..\.gitignore" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="RegexAssistant.rc">

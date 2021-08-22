@@ -1,26 +1,15 @@
 
 // RegexAssistantDlg.h : header file
 #pragma once
+#include "RegexAssistant.h"
 #include <vector>
 #include <string>
 #include "SizingDialog.h"
 #include "ScintillaWrapper.h"
 
+
 #define REPORT_ERR_AND_EXIT(exit_err_no, msg_format, ...) {CString msg; msg.Format(_T("Error:  " msg_format "  Performming early exit due to error."),__VA_ARGS__);AfxMessageBox(msg);exit(exit_err_no);}
 class CRegexAssistantDlgAutoProxy;
-
-enum Regex_Compatibility {
-	REGEX_COMPATIBILITY_BOOST,
-	REGEX_COMPATIBILITY_SCINTILLA_POSIX,
-	REGEX_COMPATIBILITY_SCINTILLA,
-	REGEX_COMPATIBILITY_BOOST_MULTILINE,
-	REGEX_COMPATIBILITY_BOOST_PERL,
-	REGEX_COMPATIBILITY_BOOST_SED,
-	REGEX_COMPATIBILITY_BOOST_DEFAULT,
-	REGEX_COMPATIBILITY_STD_REGEX,
-	REGEX_COMPATIBILITY_STD_REGEX_SED,
-	NUM_OF_MARKERS = 5
-};
 
 struct MARKERDATAtag
 {
@@ -38,7 +27,8 @@ class CRegexAssistantDlg :	public CSizingDialog
 	static const int MaxInsertItemsList;
 	static const CString InsertItemsList[];
 public:
-	CRegexAssistantDlg(CString regex_search, CString regex_replace, CString Sample, CRegexAssistantApp::SampleLoadMethod sampleloadmethod, int MonitorToDisplay, CWnd* pParent = nullptr);	// standard constructor
+	CRegexAssistantDlg(CString regex_search, CString regex_replace, CString Sample, CRegexAssistantApp::SampleLoadMethod sampleloadmethod, 
+						int MonitorToDisplay, Regex_Compatibility regex_compatibility, CWnd* pParent = nullptr);
 	virtual ~CRegexAssistantDlg();
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_REGEXASSISTANT_DIALOG };

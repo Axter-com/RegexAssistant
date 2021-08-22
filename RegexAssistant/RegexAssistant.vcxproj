@@ -89,6 +89,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <CustomBuildAfterTargets />
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -185,6 +186,10 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -221,6 +226,16 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>msbuild.exe ..\$(ProjectName).sln /p:Configuration=Release /p:Platform="x86"</Command>
+      <Command>msbuild.exe ..\$(ProjectName).sln /p:Configuration=Release /p:Platform="x86"
+powershell "Compress-Archive $(SolutionDir)$(Platform)\$(Configuration)\RegexAssistant.exe $(SolutionDir)$(Platform)\$(Configuration)\RegexAssistant.zip" -CompressionLevel Optimal -Force
+powershell "Compress-Archive $(SolutionDir)Win32\$(Configuration)\RegexAssistant.exe $(SolutionDir)Win32\$(Configuration)\RegexAssistant.zip" -CompressionLevel Optimal -Force</Command>
+    </PostBuildEvent>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CAboutDlg.h" />
@@ -233,6 +248,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="RegexAssistant.h" />
     <ClInclude Include="RegexAssistantDlg.h" />
+    <ClInclude Include="RegexAssistantDlg.hpp" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ScintillaWrapper.h" />
     <ClInclude Include="Screen.h" />
@@ -262,6 +278,8 @@
     <Midl Include="RegexAssistant.idl" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\.gitignore" />
+    <None Include="..\README.md" />
     <None Include="RegexAssistant.reg" />
     <None Include="res\RegexAssistant.rc2" />
   </ItemGroup>

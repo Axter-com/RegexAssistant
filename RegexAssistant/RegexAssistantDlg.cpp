@@ -41,151 +41,16 @@ typedef match_flag_type  RegexFlagType;
 #pragma warning(disable:26495)
 #pragma warning(disable:6495)
 
-
 IMPLEMENT_DYNAMIC(CRegexAssistantDlg, CDialogEx);
 
-//Initialize static members of CRegexAssistantDlg
-#define INSERT_ITEMS_LIST( _a, _b, _c, _d )		_T(_b), _T(_a), _T(_c), _T(_d)
-const CString CRegexAssistantDlg::InsertItemsList[] =
-{
-	//Item starting with *, are patterns which can only be used with filter, which uses boost regex logic
-	INSERT_ITEMS_LIST( "Any single character", ".", "a.c", "abc, aac, acc, adc, aec, ..." ),
-	INSERT_ITEMS_LIST( "Zero or more character(s)", ".*", "comm.*", "commercial ventures, commerce activity" ),
-	INSERT_ITEMS_LIST( "Zero or more character(s), no white space", "\\w*", "comm.\\w*", "commercial, commerce, community" ),
-	INSERT_ITEMS_LIST( "0 or more of previous expression", "*", "ab*c", "ac, abc, abbc, abbbc, ..." ),
-	INSERT_ITEMS_LIST( "1 or more of previous expression", "+", "ab+c", "abc, abbc, abbbc, ..." ),
-	INSERT_ITEMS_LIST( "0 or 1 of previous expression", "?", "ab?c", "ac, abc" ),
-	INSERT_ITEMS_LIST( "Start of a string", "^", "^abc", "abc, abcdefg, abc123, ..." ),
-	INSERT_ITEMS_LIST( "End of a string", "$", "abc$", "abc, endsinabc, 123abc, ..." ),
-	INSERT_ITEMS_LIST( "*Word Boundary", "\\b", "\\babc\\b", "abc" ),
-	INSERT_ITEMS_LIST( "Word", "\\w+", "\\w+", "abc, defg, foo3, foo_123" ),
-	INSERT_ITEMS_LIST( "White space", "\\s", "a\\sc", "a c" ),
-	INSERT_ITEMS_LIST( "Matches any non-white-space character", "\\S", "axter\\Scom", "axter.com, axter-com" ),
-	INSERT_ITEMS_LIST( "Any single digit", "[0-9]", "cat[0-9]ood", "cat3ood, cat8ood, cat2ood, ..." ),
-	INSERT_ITEMS_LIST( "Any single letter", "[a-zA-Z]", "cat[a-zA-Z]ood", "catfood, catHood, catwood" ),
-	INSERT_ITEMS_LIST( "Any single lowercase letter", "[a-z]", "cat[a-z]ood", "catfood, cathood, catwood" ),
-	INSERT_ITEMS_LIST( "Any single uppercase letter", "[A-Z]", "cat[A-Z]ood", "catFood, catHood, catWood" ),
-	INSERT_ITEMS_LIST( "Any single letter or digit", "[0-9a-zA-Z]", "cat[0-9a-zA-Z]ood", "cat5ood, cathood, catWood" ),
-	INSERT_ITEMS_LIST( "Any non-digit", "[^0-9]", "cat[^0-9]ood", "cat@ood, cathood, catWood" ),
-	INSERT_ITEMS_LIST( "Any non-letter", "[^a-zA-Z]", "cat[^a-zA-Z]ood", "cat@ood, cat9ood, cat$ood" ),
-	INSERT_ITEMS_LIST( "Any printable character or string (non-whitespace) Note: Can be used to exclude empty lines in filter field.", "\\S+", "", "" ),
-	INSERT_ITEMS_LIST( "*Lookahead", "(?=)", "foo(?=bar)", "foobar" ),
-	INSERT_ITEMS_LIST( "*Lookahead Not", "(?!)", "foo(?!bar)", "food foofoo" ),
-	//ToDo: Check if Lookbehind is supported by the BOOST
-	//"*Lookbehind", "", "(?<=bar)foo", ""),
-	//"*Lookbehind Not", "", "(?<!bar)foo", ""),
-	INSERT_ITEMS_LIST( "Windows return/new line", "\\r\\n", "", "" ),
-	INSERT_ITEMS_LIST( "UNIX new line", "\\n", "", "" ),
-	INSERT_ITEMS_LIST( "(Win-Local) File name pattern", "[a-zA-Z]:\\\\[0-9a-zA-Z\\\\\\s\\-_]+\\.[0-9a-zA-Z_]+", "", "C:\\program\\filename.txt, d:\\foofoo.doc" ),
-	INSERT_ITEMS_LIST( "(Win-UNC) File name pattern", "\\\\\\\\[0-9a-zA-Z\\\\\\s\\-_]+\\.[0-9a-zA-Z_]+", "", "\\\\axter\\devl\\dmaisonave\\filename.txt, \\\\DevMain\\MyShare\\foofoo.doc" ),
-	INSERT_ITEMS_LIST( "(UNIX) File name pattern", "/[0-9a-zA-Z/\\s\\-_]+\\.[0-9a-zA-Z_]+", "", "/var/log/data.txt" ),
-	INSERT_ITEMS_LIST( "Email pattern", "[0-9a-zA-Z\\-\\s_]+@[0-9a-zA-Z\\-_]+\\.[0-9a-zA-Z]+", "", "foofoo@axter.com, bill@foofoo.com, ..." ),
-	INSERT_ITEMS_LIST( "GUID pattern", "[0-9a-fA-F]+-[0-9a-fA-F]+-[0-9a-fA-F]+-[0-9a-fA-F]+-[0-9a-fA-F]+", "", "E6710055-F6FF-4f60-BF39-EF3372B2A48B" ),
-	INSERT_ITEMS_LIST( "*Error reporting pattern", "(?i)fail|error|warn|exception|err\\s?no", "", "Error, Warn, Warning, Exception, exception, FAIL" ),
-	INSERT_ITEMS_LIST( "*yyyy-mm-dd date format", "^(19|20)\\d\\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])", "", " 2012-01-31,  1999-12-11,  2008/1/31" ),
-	INSERT_ITEMS_LIST( "*dd-mm-yyyy date format", "^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\\d\\d", "", "07-03-1961, 21/11/1984, 31-1-2000" ),
-	INSERT_ITEMS_LIST( "*dd-mm date format", "^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])", "", "07-03, 21/11, 31-1" ),
-	INSERT_ITEMS_LIST( "*mmm dd, yyyy", "[A-Z][a-z][a-z] [0-9][0-9]*, [0-9]{4}", "", "Jan 3, 2003" ),
-	INSERT_ITEMS_LIST( "*Time patterns", "((0?[1-9]|1[012])(\\s*:\\s*([0-5]\\d))?(\\s*:\\s*([0-5]\\d))?(\\s*([AaPp])[Mm]?)$|(2[0-3]|[1]\\d|0?\\d)(\\s*:\\s*([0-5]\\d))(\\s*:\\s*([0-5]\\d))?)", "", "3:00:59 | 12pm | 6:30 a" ),
-	INSERT_ITEMS_LIST( "*US phone no. pattern [word]", "\\b([0-9]{3})-([0-9]{3})-([0-9]{4})\\b", "", "111-123-4567" ),
-	INSERT_ITEMS_LIST( "*US phone no. pattern", "((\\(\\d{3}\\))|(\\d{3}-))\\d{3}-\\d{4}", "", "(111)123-4567, 111-123-4567, (111)-123-4567" ),
-	INSERT_ITEMS_LIST( "*International & Domestic Phone Numbers with Ext", "([\\+][0-9]{1,3}([ \\.\\-])?)?([\\(]{1}[0-9]{3}[\\)])?([0-9A-Z \\.\\-]{1,32})((x|ext|extension)?[0-9]{1,4}?)", "", "(123)456-7890 | (123)456-7890 x123 | +1 (123)456-7890 | 12 3456 789 0 x1234 | (123)456-7890x123 |(123)456-7890ext123 | (123)456-7890 extension123 | 123.456.7890 | 1234567890 | 1234567 | 12 34 56 78 90 | 12 3 4567 890123 x4567 | +12 3456 7890 | +12 34 56 7890 | +12 3456 7890 | +12 34567890" ),
-	INSERT_ITEMS_LIST( "*IP pattern", "\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b", "", "192.168.0.3, 255.255.255.255" ),
-	INSERT_ITEMS_LIST( "*Social security number pattern", "[0-9]{3}-[0-9]{2}-[0-9]{4}", "", "" ),
-	INSERT_ITEMS_LIST( "*Float pattern", "[-+]?([0-9]+)?\\.[0-9]+", "", "123.456, 0.99, .987" ),
-	INSERT_ITEMS_LIST( "*Zip code pattern", "[0-9]{5}(-[0-9]{4})?", "", "19133, 08015-1234" ),
-	INSERT_ITEMS_LIST( "*URL pattern", "http(s)*://(([\\-\\w]+\\.)+[a-zA-Z]{2,4}.*)", "", "http://axter.com, http://axter.com, https://axter.com" ),
-	INSERT_ITEMS_LIST( "*FTP pattern", "ftp://([\\w](:[\\w]))*(([\\-\\w]+\\.)+[a-zA-Z]{2,4}[/\\w]*)", "", "" ),
-	INSERT_ITEMS_LIST( "*Domain pattern", "[\\-\\w]+\\.)+[a-zA-Z]{2,4}", "", "" ),
-	INSERT_ITEMS_LIST( "*Major credit card pattern", "\\d{4}-\\d{4}-\\d{4}-\\d{4}", "", "" ),
-	INSERT_ITEMS_LIST( "*User name pattern", "[\\s\\[][a-zA-Z0-9_-]{3,16}\\\\[a-z0-9_-]{3,16}[\\s\\]]", "", "axter-nj\\david" ),
-	INSERT_ITEMS_LIST( "HTML tag pattern", "</?[a-zA-Z]+/?>", "", "" ),
-	INSERT_ITEMS_LIST( "*Web color pattern", "#?(([fFcC0369])\\2){3}", "", "#FFFFFF | FFCC00 | 003300" ),
-	INSERT_ITEMS_LIST( "*SQL basic query patterns", "(?i)(SELECT\\s[\\w\\*\\)\\(\\,\\s]+\\sFROM\\s[\\w]+)|(?i)(UPDATE\\s[\\w]+\\sSET\\s[\\w\\,\\'\\=]+)|(?i)(INSERT\\sINTO\\s[\\d\\w]+[\\s\\w\\d\\)\\(\\,]*\\sVALUES\\s\\([\\d\\w\\'\\,\\)]+)|(?i)(DELETE\\sFROM\\s[\\d\\w\\'\\=]+)", "", "SELECT * FROM TABLE, insert into table, UPDATE TABLE SET FIELD=VALUE WHERE ID_FIELD=VALUE_ID, DELETE FROM TABLE WHERE" ),
-	INSERT_ITEMS_LIST( "*Collect file pattern", "([a-zA-Z]:(\\\\w+)*\\\\[a-zA-Z0_9]+)?.cvf", "", "c:\\Program\\Data\\CollectInc.cvf" ),
-	INSERT_ITEMS_LIST( "Find function with 1 argument pattern", "(func_name)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "(CreateFoo)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "CreateFoo(ArgData)" ),
-	INSERT_ITEMS_LIST( "Find function with 2 arguments pattern", "(func_name)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "(CreateFoo)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "CreateFoo(ArgData, arg2)" ),
-	INSERT_ITEMS_LIST( "Find function with 3 arguments pattern", "(func_name)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "(CreateFoo)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "CreateFoo(ArgData, arg2, arg3)" ),
-	INSERT_ITEMS_LIST( "Find function with 4 arguments pattern", "(func_name)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "(CreateFoo)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "CreateFoo(ArgData, arg2, arg3, arg4)" ),
-	INSERT_ITEMS_LIST( "Find function with 5 arguments pattern", "(func_name)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "(CreateFoo)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "CreateFoo(ArgData, arg2, arg3, arg4, arg5)" ),
-	//Item starting with ~, are patterns which can only be used with Markers, which uses Scintilla regex logic
-	//Item starting with $ in second column, are patterns which can only be used for replacement regex field, and when double clicked will get inserted into replacement field.
-	INSERT_ITEMS_LIST( "Function with 1 argument replacement pattern", "$\\1(\\2)", "", "" ),
-	INSERT_ITEMS_LIST( "Function with 2 arguments replacement pattern", "$\\1(\\2, \\3)", "", "" ),
-	INSERT_ITEMS_LIST( "Function with 3 arguments replacement pattern", "$\\1(\\2, \\3, \\4)", "", "" ),
-	INSERT_ITEMS_LIST( "Function with 4 arguments replacement pattern", "$\\1(\\2, \\3, \\4, \\5)", "", "" ),
-	INSERT_ITEMS_LIST( "Function with 5 arguments replacement pattern", "$\\1(\\2, \\3, \\4, \\5, \\6)", "", "" ),
-	INSERT_ITEMS_LIST( "", "", "", "" )
-};
+#include "RegexAssistantDlg.hpp"  //CRegexAssistantDlg static members initialization
 
-const int CRegexAssistantDlg::QtyColumnsInLinst = 4;
-const int CRegexAssistantDlg::MaxInsertItemsList = ((sizeof( InsertItemsList ) / sizeof( InsertItemsList[0] ))) / QtyColumnsInLinst;
-MARKERDATAtag CRegexAssistantDlg::m_MarkerData[NUM_OF_MARKERS] = {
-	{RGB( 0, 0, 0 )/*Black*/, RGB( 255, 255, 0 )/*Yellow*/, FALSE},
-{RGB( 255, 255, 255 )/*White*/, RGB( 0, 255, 255 )/*Cyan*/, FALSE},
-{RGB( 0, 0, 0 /*Black*/ ), RGB( 255, 128, 0 )/*Orange*/, FALSE},
-{RGB( 255, 0, 0 )/*Red*/, RGB( 64, 128, 128 )/*Light Green*/, FALSE},
-{RGB( 0, 0, 205 )/*blue3*/, RGB( 255, 128, 255 )/*Pink*/, FALSE}
-};
-
-const CString CRegexAssistantDlg::m_DefaultTestTargetTextData = _T( "\
-David                c:\\foo.doc\r\n\
-David Maisonave      c:\\foofoo.doc\r\n\
-David Maisonave Sr   c:\\foosball.txt\r\n\
-David Maisonave Jr   c:\\book\\football.doc\r\n\
-David Maisonave Dr   c:\\footnotes\\book1.doc\r\n\
-Richard E. Maisonave c:\\red\\foothill\\door33.foo\r\n\
-Felicia Maisonave    c:\\red\\footages\\doc\\foo.txt\r\n\
-Sr David Maisonave   c:\\foozler\\foosub\\foo654.doc\r\n\
-c:\\book4.doc         foolery\r\n\
-c:\\film.txt          foozles\r\n\
-footlights           David\r\n\
-foodie               Friday\r\n\
-foolhardier\r\n\
-/sub/subsub/subsubsub/footsteps/footlocker.cvf\r\n\
-\\sub\\subsub\\subsubsub\\footstools\\foozle.foo\r\n\
-footlights           footholds\r\n\
-foodie               foozles\r\n\
-732-123-4567         http://foolhardy.com\r\n\
-http://axter.com     732-987-6543\r\n\
-800-888-8933         ftp://foofaraw.com\r\n\
-1-800-325-9345       http://footloose.net\r\n\
-10.0.0.123           134-42-0156\r\n\
-459-78-2390          10.0.0.101 \r\n\
-" );
-
-bool CRegexAssistantDlg::IsBoostRegex( Regex_Compatibility regex_compalibility )
-{
-	if ( regex_compalibility == REGEX_COMPATIBILITY_BOOST ||
-		 regex_compalibility == REGEX_COMPATIBILITY_BOOST_MULTILINE ||
-		 regex_compalibility == REGEX_COMPATIBILITY_BOOST_PERL ||
-		 regex_compalibility == REGEX_COMPATIBILITY_BOOST_SED ||
-		 regex_compalibility == REGEX_COMPATIBILITY_BOOST_DEFAULT
-		 )
-		return true;
-	return false;
-}
-
-bool CRegexAssistantDlg::IsBoostOrStd_Regex( Regex_Compatibility regex_compalibility )
-{
-	if ( regex_compalibility == REGEX_COMPATIBILITY_STD_REGEX || regex_compalibility == REGEX_COMPATIBILITY_STD_REGEX_SED )
-		return true;
-	return IsBoostRegex( regex_compalibility );
-}
-
-bool CRegexAssistantDlg::IsScintillaRegex( Regex_Compatibility regex_compalibility )
-{
-	if ( regex_compalibility == REGEX_COMPATIBILITY_SCINTILLA_POSIX ||
-		 regex_compalibility == REGEX_COMPATIBILITY_SCINTILLA )
-		return true;
-	return false;
-}
-
-CRegexAssistantDlg::CRegexAssistantDlg( CString regex_search, CString regex_replace, CString Sample, CRegexAssistantApp::SampleLoadMethod sampleloadmethod, int MonitorToDisplay, CWnd* pParent /*=nullptr*/)
+CRegexAssistantDlg::CRegexAssistantDlg( CString regex_search, CString regex_replace, CString Sample, CRegexAssistantApp::SampleLoadMethod sampleloadmethod, 
+										int MonitorToDisplay, Regex_Compatibility regex_compatibility, CWnd* pParent /*=nullptr*/)
 	: CSizingDialog(IDD_REGEXASSISTANT_DIALOG, pParent)
 	, m_FieldId( 0 ), lastErr( 0 ), m_bCase( FALSE ), m_EnableRegexCompatibilityOption( TRUE ), m_bMakingChangeByReplacementLogic( false ), m_pAutoProxy(NULL)
 	, m_CurrentText( regex_search )	, m_MaxViewWidth( 4000 ), m_MonitorToDisplay( MonitorToDisplay ), m_SampleLoadMethod(sampleloadmethod)
-	, m_TestTargetTextData( m_DefaultTestTargetTextData )
+	, m_TestTargetTextData( m_DefaultTestTargetTextData ), m_Regex_Compalibility(regex_compatibility)
 {
 	if ( sampleloadmethod == CRegexAssistantApp::SampleLoadMethod::SampleLoadFromCommandLine )
 		m_TestTargetTextData = Sample;
@@ -216,52 +81,13 @@ CRegexAssistantDlg::CRegexAssistantDlg( CString regex_search, CString regex_repl
 			m_TestTargetTextData.Format( _T( "Could not open file '%s' or file has less then 3 characters.\r\nAppending default string....\r\n\r\n%s" ), FXString::ToWString( Sample ).c_str() , FXString::ToWString(m_DefaultTestTargetTextData ).c_str() );
 	}
 
-	if ( m_FieldId > 0 )
-		m_Regex_Compalibility = REGEX_COMPATIBILITY_SCINTILLA_POSIX;
-	else
-		m_Regex_Compalibility = REGEX_COMPATIBILITY_BOOST;
+	//if ( m_FieldId > 0 )
+	//	m_Regex_Compalibility = REGEX_COMPATIBILITY_SCINTILLA_POSIX;
+	//else
+	//	m_Regex_Compalibility = REGEX_COMPATIBILITY_BOOST;
 
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
-
-CRegexAssistantDlg::~CRegexAssistantDlg()
-{
-	if (m_pAutoProxy != nullptr)
-		m_pAutoProxy->m_pDialog = nullptr;
-}
-
-void CRegexAssistantDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CSizingDialog::DoDataExchange(pDX);
-	DDX_Control( pDX, IDC_REGEX_EDIT_BOX, m_RegexEditBox );
-	DDX_Control( pDX, IDC_TOKEN_LIST_CTRL, m_TokenListCtrl );
-	DDX_Control( pDX, IDC_IGNORE_CASE_CHECK, m_Case );
-	DDX_Control( pDX, IDC_REGEX_COMPATIBILITY_SELECTION_COMBO, m_RegexCompatibility_cmbx );
-	DDX_Control( pDX, IDC_CONVERT_SQL_WILD_TO_REGEX_BUTTON, m_ConvertSqlWildToRegex_btn );
-	DDX_Control( pDX, IDC_CONVERT_FILESYSTEM_WILD_TO_REGEX_BUTTON, m_ConvertFilesysWildToRegex_btn );
-	DDX_Control( pDX, IDC_REGEX_REPLACEWITH_BOX, m_ReplaceWithBox );
-	DDX_Control( pDX, IDC_REPLACE_BUTTON, m_ReplaceButton );
-	DDX_Control( pDX, IDC_REPLACEWITH_STATIC, m_ReplaceWithStaticText );
-	DDX_Control( pDX, IDC_REPLACE_UNDO_BUTTON, m_ReplaceUndoButton );
-	DDX_Control( pDX, IDC_STATIC_GROUPBOX_TOKEN, m_GroupBoxToken );
-}
-
-BEGIN_MESSAGE_MAP(CRegexAssistantDlg, CSizingDialog)
-	ON_WM_SYSCOMMAND()
-	ON_WM_CLOSE()
-	ON_WM_PAINT()
-	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED( IDOK, &CRegexAssistantDlg::OnBnClickedOk )
-	ON_NOTIFY( NM_DBLCLK, IDC_TOKEN_LIST_CTRL, &CRegexAssistantDlg::OnNMDblclkTokenListCtrl )
-	ON_BN_CLICKED( IDC_IGNORE_CASE_CHECK, &CRegexAssistantDlg::OnBnClickedIgnoreCaseCheck )
-	ON_BN_CLICKED( IDC_CONVERT_SQL_WILD_TO_REGEX_BUTTON, &CRegexAssistantDlg::OnBnClickedConvertSqlWildToRegexButton )
-	ON_BN_CLICKED( IDC_CONVERT_FILESYSTEM_WILD_TO_REGEX_BUTTON, &CRegexAssistantDlg::OnBnClickedConvertFilesystemWildToRegexButton )
-	ON_EN_CHANGE( IDC_REGEX_EDIT_BOX, &CRegexAssistantDlg::OnEnChangeRegexEditBox )
-	ON_CBN_SELCHANGE( IDC_REGEX_COMPATIBILITY_SELECTION_COMBO, &CRegexAssistantDlg::OnCbnSelchangeRegexCompatibilitySelectionCombo )
-	ON_BN_CLICKED( IDC_REPLACE_BUTTON, &CRegexAssistantDlg::OnBnClickedReplaceButton )
-	ON_BN_CLICKED( IDC_REPLACE_UNDO_BUTTON, &CRegexAssistantDlg::OnBnClickedReplaceUndoButton )
-	ON_BN_CLICKED( IDC_STATIC_GROUPBOX_TEST_TARGET_TEXT, &CRegexAssistantDlg::OnBnClickedStaticGroupboxTestTargetText )
-END_MESSAGE_MAP()
 
 BOOL CRegexAssistantDlg::OnInitDialog()
 {
@@ -290,37 +116,29 @@ BOOL CRegexAssistantDlg::OnInitDialog()
 		multimonitors.MoveWindowToMonitor( this->m_hWnd, static_cast<UINT>(m_MonitorToDisplay) );
 	}
 
-	ShowWindow( SW_SHOWNORMAL );
 	SetOrgSizeAsMinSize();
 	m_RegexEditBox.SetWindowText( m_CurrentText );
-	m_TokenListCtrl.InsertColumn( IdxRegex, _T( "Regex" ), LVCFMT_LEFT, 80 );
-	m_TokenListCtrl.InsertColumn( IdxDescription, _T( "Description" ), LVCFMT_LEFT, 260 );
+	m_TokenListCtrl.InsertColumn( IdxRegex, _T( "Regex" ), LVCFMT_LEFT, 100 );
+	m_TokenListCtrl.InsertColumn( IdxDescription, _T( "Description" ), LVCFMT_LEFT, 300 );
 	m_TokenListCtrl.InsertColumn( IdxExample, _T( "Example" ), LVCFMT_LEFT, 110 );
-	m_TokenListCtrl.InsertColumn( IdxMatch, _T( "Match(es)" ), LVCFMT_LEFT, 180 );
+	m_TokenListCtrl.InsertColumn( IdxMatch, _T( "Match(es)" ), LVCFMT_LEFT, 260 );
 	for ( int i = 0; i < (MaxInsertItemsList - 1); ++i )
 	{
 		if ( m_FieldId > 0 && InsertItemsList[i * QtyColumnsInLinst + IdxDescription].Left( 1 ) == "*" )
 			continue;
 		if ( m_FieldId == 0 && InsertItemsList[i * QtyColumnsInLinst + IdxDescription].Left( 1 ) == "~" )
 			continue;
-		if ( (!m_EnableRegexCompatibilityOption || !IsBoostOrStd_Regex( m_Regex_Compalibility )) && InsertItemsList[i * QtyColumnsInLinst + IdxRegex].Left( 1 ) == "$" )
-			continue;
 
 		CString Description = InsertItemsList[i * QtyColumnsInLinst + IdxDescription];
 		if ( InsertItemsList[i * QtyColumnsInLinst + IdxDescription].Left( 1 ) == "*" || InsertItemsList[i * QtyColumnsInLinst + IdxDescription].Left( 1 ) == "~" )
 			Description = InsertItemsList[i * QtyColumnsInLinst + IdxDescription].Mid( 1 );
 		int nIndex = m_TokenListCtrl.InsertItem( i, InsertItemsList[i * QtyColumnsInLinst + IdxRegex] );
-
-		//ToDo: Double check to see the purpose of the following 3 commented out lines of code
-		/*if ( InsertItemsList[i * QtyColumnsInLinst + IdxRegex].Left( 1 ) == "$" )
-			m_TokenListCtrl.SetItemText( nIndex, 1, InsertItemsList[i * QtyColumnsInLinst + IdxRegex].Mid( 1 ) );
-		else*/
 		m_TokenListCtrl.SetItemText( nIndex, IdxDescription,  Description);
 		m_TokenListCtrl.SetItemText( nIndex, IdxExample, InsertItemsList[i * QtyColumnsInLinst + IdxExample] );
 		m_TokenListCtrl.SetItemText( nIndex, IdxMatch, InsertItemsList[i * QtyColumnsInLinst + IdxMatch] );
 
 		m_RegexList.push_back( InsertItemsList[i * QtyColumnsInLinst + IdxRegex] );
-	} // for
+	}
 
 	if ( (m_FieldId > 0 && m_bCase) || m_CurrentText.Left( 4 ) == "(?i)" )
 		m_Case.SetCheck( BST_CHECKED );
@@ -332,10 +150,10 @@ BOOL CRegexAssistantDlg::OnInitDialog()
 										_T( "Scintilla" ),
 										_T( "" ),
 										WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN,
-										10,
-										500,  //470
-										(rect.right - rect.left) + 20,
-										350, //90
+										20,
+										470,  //470
+										(rect.right - rect.left),
+										(rect.bottom - rect.top) + 138, //430
 										GetSafeHwnd(),
 										NULL,
 										AfxGetInstanceHandle(),
@@ -367,17 +185,10 @@ BOOL CRegexAssistantDlg::OnInitDialog()
 	m_ReplaceUndoButton.EnableWindow( FALSE );
 	if ( !m_EnableRegexCompatibilityOption || !IsBoostOrStd_Regex( m_Regex_Compalibility ) )
 	{
-		m_ReplaceWithBox.ShowWindow( SW_HIDE );
-		m_ReplaceButton.ShowWindow( SW_HIDE );
-		m_ReplaceWithStaticText.ShowWindow( SW_HIDE );
-		m_ReplaceUndoButton.ShowWindow( SW_HIDE );
-		m_TokenListCtrl.GetWindowRect( &rect );
-		rect.bottom += 45;
-		m_TokenListCtrl.SetWindowPos( NULL, 0, 0, rect.right - rect.left, rect.bottom - rect.top, SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER );
-
-		m_GroupBoxToken.GetWindowRect( &rect );
-		rect.bottom += 45;
-		m_GroupBoxToken.SetWindowPos( NULL, 0, 0, rect.right - rect.left, rect.bottom - rect.top, SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER );
+		m_ReplaceWithBox.EnableWindow( FALSE );
+		m_ReplaceButton.EnableWindow( FALSE );
+		m_ReplaceWithStaticText.EnableWindow( FALSE );
+		m_ReplaceUndoButton.EnableWindow( FALSE );
 	}
 
 	AddControl( IDC_REGEX_EDIT_BOX, _T( "RX" ) );
@@ -387,18 +198,56 @@ BOOL CRegexAssistantDlg::OnInitDialog()
 	AddControl( IDC_REGEX_COMPATIBILITY_SELECTION_COMBO, _T( "RX" ) );
 	AddControl( IDC_STATIC_GROUPBOX_TOKEN );
 	AddControl( IDC_TOKEN_LIST_CTRL );
-	if ( m_EnableRegexCompatibilityOption && IsBoostOrStd_Regex( m_Regex_Compalibility ) )
-	{
-		AddControl( IDC_REPLACEWITH_STATIC );
-		AddControl( IDC_REGEX_REPLACEWITH_BOX );
-		AddControl( IDC_REPLACE_BUTTON );
-		AddControl( IDC_REPLACE_UNDO_BUTTON );
-	}
+	AddControl( IDC_REPLACEWITH_STATIC );
+	AddControl( IDC_REGEX_REPLACEWITH_BOX );
+	AddControl( IDC_REPLACE_BUTTON );
+	AddControl( IDC_REPLACE_UNDO_BUTTON );
 	AddControl( IDC_STATIC_GROUPBOX_TEST_TARGET_TEXT );
 	AddControl( m_ScintillaWrapper.GetWnd() );
+	ShowWindow( SW_SHOWNORMAL );
 
 	return TRUE;
 }
+
+CRegexAssistantDlg::~CRegexAssistantDlg()
+{
+	if ( m_pAutoProxy != nullptr )
+		m_pAutoProxy->m_pDialog = nullptr;
+}
+
+
+void CRegexAssistantDlg::DoDataExchange( CDataExchange* pDX )
+{
+	CSizingDialog::DoDataExchange( pDX );
+	DDX_Control( pDX, IDC_REGEX_EDIT_BOX, m_RegexEditBox );
+	DDX_Control( pDX, IDC_TOKEN_LIST_CTRL, m_TokenListCtrl );
+	DDX_Control( pDX, IDC_IGNORE_CASE_CHECK, m_Case );
+	DDX_Control( pDX, IDC_REGEX_COMPATIBILITY_SELECTION_COMBO, m_RegexCompatibility_cmbx );
+	DDX_Control( pDX, IDC_CONVERT_SQL_WILD_TO_REGEX_BUTTON, m_ConvertSqlWildToRegex_btn );
+	DDX_Control( pDX, IDC_CONVERT_FILESYSTEM_WILD_TO_REGEX_BUTTON, m_ConvertFilesysWildToRegex_btn );
+	DDX_Control( pDX, IDC_REGEX_REPLACEWITH_BOX, m_ReplaceWithBox );
+	DDX_Control( pDX, IDC_REPLACE_BUTTON, m_ReplaceButton );
+	DDX_Control( pDX, IDC_REPLACEWITH_STATIC, m_ReplaceWithStaticText );
+	DDX_Control( pDX, IDC_REPLACE_UNDO_BUTTON, m_ReplaceUndoButton );
+	DDX_Control( pDX, IDC_STATIC_GROUPBOX_TOKEN, m_GroupBoxToken );
+}
+
+BEGIN_MESSAGE_MAP( CRegexAssistantDlg, CSizingDialog )
+	ON_WM_SYSCOMMAND()
+	ON_WM_CLOSE()
+	ON_WM_PAINT()
+	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED( IDOK, &CRegexAssistantDlg::OnBnClickedOk )
+	ON_NOTIFY( NM_DBLCLK, IDC_TOKEN_LIST_CTRL, &CRegexAssistantDlg::OnNMDblclkTokenListCtrl )
+	ON_BN_CLICKED( IDC_IGNORE_CASE_CHECK, &CRegexAssistantDlg::OnBnClickedIgnoreCaseCheck )
+	ON_BN_CLICKED( IDC_CONVERT_SQL_WILD_TO_REGEX_BUTTON, &CRegexAssistantDlg::OnBnClickedConvertSqlWildToRegexButton )
+	ON_BN_CLICKED( IDC_CONVERT_FILESYSTEM_WILD_TO_REGEX_BUTTON, &CRegexAssistantDlg::OnBnClickedConvertFilesystemWildToRegexButton )
+	ON_EN_CHANGE( IDC_REGEX_EDIT_BOX, &CRegexAssistantDlg::OnEnChangeRegexEditBox )
+	ON_CBN_SELCHANGE( IDC_REGEX_COMPATIBILITY_SELECTION_COMBO, &CRegexAssistantDlg::OnCbnSelchangeRegexCompatibilitySelectionCombo )
+	ON_BN_CLICKED( IDC_REPLACE_BUTTON, &CRegexAssistantDlg::OnBnClickedReplaceButton )
+	ON_BN_CLICKED( IDC_REPLACE_UNDO_BUTTON, &CRegexAssistantDlg::OnBnClickedReplaceUndoButton )
+	ON_BN_CLICKED( IDC_STATIC_GROUPBOX_TEST_TARGET_TEXT, &CRegexAssistantDlg::OnBnClickedStaticGroupboxTestTargetText )
+END_MESSAGE_MAP()
 
 void CRegexAssistantDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
@@ -570,7 +419,7 @@ void CRegexAssistantDlg::OnBnClickedConvertFilesystemWildToRegexButton()
 void CRegexAssistantDlg::OnEnChangeRegexEditBox( CString sMarkString, int /*FieldId*/, bool ClearMarkers, DWORD Flag, int TargetLineNo )
 {
 	long Start = 0, Stop = INT_MAX;
-	int Marker = 1; // FieldId - 1;
+	int Marker = m_Regex_Compalibility; // FieldId - 1;
 	TextToFind ft = {0};
 	int iLineIndex = 0;
 	if ( ClearMarkers )
@@ -642,7 +491,7 @@ void CRegexAssistantDlg::OnEnChangeRegexEditBox_LineByLine( CString sMarkString 
 				ft.chrgText.cpMax = CurrentLineBytePos + (long)std::distance( itHaystackStart, NeedleEnd );
 				ft.chrg.cpMin = ft.chrgText.cpMax + 1;
 				m_ScintillaWrapper.SendEditor( SCI_STARTSTYLING, ft.chrgText.cpMin, 0x1f );
-				m_ScintillaWrapper.SendEditor( SCI_SETSTYLING, ft.chrgText.cpMax - ft.chrgText.cpMin, 1 );
+				m_ScintillaWrapper.SendEditor( SCI_SETSTYLING, ft.chrgText.cpMax - ft.chrgText.cpMin, m_Regex_Compalibility + 1 );
 
 				start = what[0].second;
 				flags = RegexFlagTypePrevAvail;
@@ -684,7 +533,7 @@ void CRegexAssistantDlg::OnEnChangeRegexEditBox_BodyMethod( CString sMarkString 
 				ft.chrgText.cpMax = (long)std::distance( itHaystackStart, NeedleEnd );
 				ft.chrg.cpMin = ft.chrgText.cpMax + 1;
 				m_ScintillaWrapper.SendEditor( SCI_STARTSTYLING, ft.chrgText.cpMin, 0x1f );
-				m_ScintillaWrapper.SendEditor( SCI_SETSTYLING, ft.chrgText.cpMax - ft.chrgText.cpMin, 1 );
+				m_ScintillaWrapper.SendEditor( SCI_SETSTYLING, ft.chrgText.cpMax - ft.chrgText.cpMin, m_Regex_Compalibility + 1 );
 				start = what[0].second;
 				flags = RegexFlagTypePrevAvail;
 			}
@@ -737,7 +586,7 @@ void CRegexAssistantDlg::OnEnChangeRegexEditBox()
 }
 
 void CRegexAssistantDlg::UpdateWindowTitle(){
-	SetWindowText( _T( "Regular Expression Assistant by David Maisonave (aka Axter)" ) );
+	SetWindowText( _T( "Regular Expression Assistant (RegexAssistant) by David Maisonave (aka Axter)" ) );
 }
 
 void CRegexAssistantDlg::UpdateConversionButtonEnableStatus( CString sMarkString )
@@ -798,9 +647,8 @@ void CRegexAssistantDlg::OnCbnSelchangeRegexCompatibilitySelectionCombo()
 		}
 	}
 	OnBnClickedIgnoreCaseCheck();
-	OnEnChangeRegexEditBox();
-	UpdateWindowTitle();
-	OnBnClickedIgnoreCaseCheck();
+
+	OldRegex_Compalibility = m_Regex_Compalibility;
 }
 
 BOOL CRegexAssistantDlg::OnNotify( WPARAM wParam, LPARAM lParam, LRESULT* pResult )
@@ -969,38 +817,29 @@ void CRegexAssistantDlg::OnBnClickedStaticGroupboxTestTargetText()
 	m_ScintillaWrapper.SendEditor( SCI_SETTEXT, 0, reinterpret_cast<sptr_t>(paste_text.c_str()) );
 }
 
+bool CRegexAssistantDlg::IsBoostRegex( Regex_Compatibility regex_compalibility )
+{
+	if ( regex_compalibility == REGEX_COMPATIBILITY_BOOST ||
+		 regex_compalibility == REGEX_COMPATIBILITY_BOOST_MULTILINE ||
+		 regex_compalibility == REGEX_COMPATIBILITY_BOOST_PERL ||
+		 regex_compalibility == REGEX_COMPATIBILITY_BOOST_SED ||
+		 regex_compalibility == REGEX_COMPATIBILITY_BOOST_DEFAULT
+		 )
+		return true;
+	return false;
+}
 
+bool CRegexAssistantDlg::IsBoostOrStd_Regex( Regex_Compatibility regex_compalibility )
+{
+	if ( regex_compalibility == REGEX_COMPATIBILITY_STD_REGEX || regex_compalibility == REGEX_COMPATIBILITY_STD_REGEX_SED )
+		return true;
+	return IsBoostRegex( regex_compalibility );
+}
 
-/*
-ToDo: Add below features
-	Feature: Build button
-		Add Build button which is disabled until content is entered into regex-input field.
-		When build button is selected, display a tree menu with following top level branches:
-		Find words
-		Find Sentence
-			Sub nodes will include the string in regex-input field.
-			Find Words
-				Find words with "foo"
-					Find words starting with "foo"
-						Only find words in the begging of a line
-						Only find words at the end of a line
-						Only find words in the middle of a line
-						Only get the part after "foo"  **-->Needs lookahead support
-						Find words anywhere
-					Find words with "foo" in the middle
-					Find words ending with "foo"
-					Find words having "foo"
-				Find words without "foo"
-	Feature: Replace Target Text
-		Add button that will replace the target text with clipboard content
-	Feature: Append Target Text
-		Add button that will append the target text field with clipboard content
-	Feature: Replace Target Text at startup
-		Add command line option that will replace target text with clipboard content when the program starts
-	Feature: Command line option for Regex input
-		Add command line option to populate the regex input field on program startup
-	Feature: command line option to perform a regex replace
-		Add command line option to perform a regex replace on a file or multiple files matching DOS wildcards
-	Feature: Add additional context menu items to the sample field
-		Add context menu item to replace (or append) sample with multiple sets of examples designed for each pattern listed in the token  list
-*/
+bool CRegexAssistantDlg::IsScintillaRegex( Regex_Compatibility regex_compalibility )
+{
+	if ( regex_compalibility == REGEX_COMPATIBILITY_SCINTILLA_POSIX ||
+		 regex_compalibility == REGEX_COMPATIBILITY_SCINTILLA )
+		return true;
+	return false;
+}

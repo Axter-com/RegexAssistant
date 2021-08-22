@@ -1,0 +1,27 @@
+$ cat .gitignore
+
+# Ignore these patterns
+desktop.ini
+~AutoRecover*.*
+*.aps
+*.exe
+*.idb
+*.ipch
+*.lib
+*.log
+*.manifest
+*.obj
+*.pch
+*.pdb
+*.sdf
+*.suo
+*.tlog
+*.user
+/boost
+/scintilla
+/x64
+/Win32
+/.vs
+/RegexAssistant/x64
+/RegexAssistant/Win32
+
