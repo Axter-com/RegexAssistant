@@ -4,7 +4,7 @@
 
 RegexAssistant is an open source Regular Expression (Regex) tool for Windows. 
 RegexAssistant has an easy to use GUI that can build and test regex. As the user types the expression, the results can be seen instantaneously.
-It has a cheatsheet token window which list the main regex tokens and common patterns.
+It has a cheatsheet token window which list the main regex tokens and common patterns. Items in the token list can be inserted into the Expression (regex) field by double clicking the desired token.
 
 ## Downloads
 Use the following link to download the latest release binaries: [Download](https://github.com/David-Maisonave/RegexAssistant/releases/tag/0.1)
@@ -31,6 +31,6 @@ Use the following link to download the latest release binaries: [Download](https
 
 ## Folder Structure
 
-Source base code for the RegexAssistant program is kept in the subfolders RegexAssistant.
+Source base code for the RegexAssistant program is kept in the subfolder RegexAssistant.
 RegexAssistant requires two libraries (Boost and Scintilla).  These to libraries are not yet included in the project.
 
