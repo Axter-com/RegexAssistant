@@ -24,4 +24,5 @@ desktop.ini
 /.vs
 /RegexAssistant/x64
 /RegexAssistant/Win32
+/enc_temp_folder
 
