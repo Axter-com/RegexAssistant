@@ -1,9 +1,7 @@
 # RegexAssistant
-[![All Releases](https://img.shields.io/github/downloads/David-Maisonave/RegexAssistant/total.svg)](https://github.com/David-Maisonave/RegexAssistant/releases/latest)
-
-# Summary
 [![logo](Docs/Logos/RegexAssitant_Logo.png)](https://github.com/David-Maisonave/RegexAssistant)
-
+# Summary
+[![All Releases](https://img.shields.io/github/downloads/David-Maisonave/RegexAssistant/total.svg)](https://github.com/David-Maisonave/RegexAssistant/releases/latest)
 RegexAssistant is an open source Regular Expression (Regex) tool for Windows. 
 RegexAssistant has an easy to use GUI that can build and test regex. As the user types the expression, the results can be seen instantaneously.
 It has a cheatsheet token window which list the main regex tokens and common patterns.
