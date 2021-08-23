@@ -229,8 +229,19 @@
     <PostBuildEvent>
       <Command>msbuild.exe ..\$(ProjectName).sln /p:Configuration=Release /p:Platform="x86"</Command>
       <Command>msbuild.exe ..\$(ProjectName).sln /p:Configuration=Release /p:Platform="x86"
-powershell "Compress-Archive $(SolutionDir)$(Platform)\$(Configuration)\RegexAssistant.exe $(SolutionDir)$(Platform)\$(Configuration)\RegexAssistant.zip" -CompressionLevel Optimal -Force
-powershell "Compress-Archive $(SolutionDir)Win32\$(Configuration)\RegexAssistant.exe $(SolutionDir)Win32\$(Configuration)\RegexAssistant.zip" -CompressionLevel Optimal -Force</Command>
+IF EXIST  "$(SolutionDir)\$(ProjectName)_$(Platform).zip" DEL /Q /F "$(SolutionDir)\$(ProjectName)_$(Platform).zip"
+IF EXIST  "$(SolutionDir)\$(ProjectName)__x86.zip" DEL /Q /F "$(SolutionDir)\$(ProjectName)__x86.zip"
+IF EXIST  "%temp%\$(ProjectName).exe" DEL /Q /F "%temp%\$(ProjectName).exe"
+copy /Y "$(SolutionDir)\$(Platform)\$(Configuration)\$(ProjectName).exe" "%temp%\$(ProjectName).exe"
+powershell Compress-Archive "%temp%\$(ProjectName).exe %temp%\$(ProjectName)_$(Platform).zip"  -CompressionLevel Optimal -Force
+copy /Y "$(SolutionDir)\Win32\$(Configuration)\$(ProjectName).exe" "%temp%\$(ProjectName).exe"
+powershell Compress-Archive "%temp%\$(ProjectName).exe %temp%\$(ProjectName)__x86.zip"  -CompressionLevel Optimal -Force
+copy /Y "%temp%\$(ProjectName)_$(Platform).zip"  "$(SolutionDir)\$(ProjectName)_$(Platform).zip"
+copy /Y "%temp%\$(ProjectName)__x86.zip" "$(SolutionDir)\$(ProjectName)__x86.zip"
+del /Q /F "%temp%\$(ProjectName).exe"
+del /Q /F "%temp%\$(ProjectName)_$(Platform).zip"
+del /Q /F "%temp%\$(ProjectName)__x86.zip"
+</Command>
     </PostBuildEvent>
     <CustomBuildStep>
       <Command>

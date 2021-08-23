@@ -2,6 +2,8 @@ $ cat .gitignore
 
 # Ignore these patterns
 desktop.ini
+RegexAssistant_h.h
+RegexAssistant_i.c
 ~AutoRecover*.*
 *.aps
 *.exe
@@ -17,6 +19,7 @@ desktop.ini
 *.suo
 *.tlog
 *.user
+*.zip
 /boost
 /scintilla
 /x64
