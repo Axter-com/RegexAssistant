@@ -1,9 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Deploy|ARM">
+      <Configuration>Deploy</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Deploy|Win32">
+      <Configuration>Deploy</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Deploy|x64">
+      <Configuration>Deploy</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
@@ -55,6 +75,21 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Static</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Deploy|ARM'">
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -229,24 +264,33 @@
     <PostBuildEvent>
       <Command>msbuild.exe ..\$(ProjectName).sln /p:Configuration=Release /p:Platform="x86"</Command>
       <Command>msbuild.exe ..\$(ProjectName).sln /p:Configuration=Release /p:Platform="x86"
-IF EXIST  "$(SolutionDir)\$(ProjectName)_$(Platform).zip" DEL /Q /F "$(SolutionDir)\$(ProjectName)_$(Platform).zip"
-IF EXIST  "$(SolutionDir)\$(ProjectName)__x86.zip" DEL /Q /F "$(SolutionDir)\$(ProjectName)__x86.zip"
+DEL /Q /F "$(SolutionDir)\$(ProjectName)*.zip"
 IF EXIST  "%temp%\$(ProjectName).exe" DEL /Q /F "%temp%\$(ProjectName).exe"
 copy /Y "$(SolutionDir)\$(Platform)\$(Configuration)\$(ProjectName).exe" "%temp%\$(ProjectName).exe"
-powershell Compress-Archive "%temp%\$(ProjectName).exe %temp%\$(ProjectName)_$(Platform).zip"  -CompressionLevel Optimal -Force
+powershell $env:PROJECTVERSION=[string](get-item %temp%\$(ProjectName).exe).VersionInfo.FileVersion  ;  $env:PROJECTCOMPRESSFILENAME=[string]::Concat("'%temp%\$(ProjectName)_v'",[string]$env:PROJECTVERSION,"'_$(Platform).zip'")   ;  Compress-Archive "%temp%\$(ProjectName).exe" "$env:PROJECTCOMPRESSFILENAME" -CompressionLevel Optimal -Force
 copy /Y "$(SolutionDir)\Win32\$(Configuration)\$(ProjectName).exe" "%temp%\$(ProjectName).exe"
-powershell Compress-Archive "%temp%\$(ProjectName).exe %temp%\$(ProjectName)__x86.zip"  -CompressionLevel Optimal -Force
-copy /Y "%temp%\$(ProjectName)_$(Platform).zip"  "$(SolutionDir)\$(ProjectName)_$(Platform).zip"
-copy /Y "%temp%\$(ProjectName)__x86.zip" "$(SolutionDir)\$(ProjectName)__x86.zip"
+powershell $env:PROJECTVERSION=[string](get-item %temp%\$(ProjectName).exe).VersionInfo.FileVersion  ;  $env:PROJECTCOMPRESSFILENAME=[string]::Concat("'%temp%\$(ProjectName)_v'",[string]$env:PROJECTVERSION,"'_x86.zip'")   ;  Compress-Archive "%temp%\$(ProjectName).exe" "$env:PROJECTCOMPRESSFILENAME" -CompressionLevel Optimal -Force
+copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
 del /Q /F "%temp%\$(ProjectName).exe"
-del /Q /F "%temp%\$(ProjectName)_$(Platform).zip"
-del /Q /F "%temp%\$(ProjectName)__x86.zip"
-</Command>
+del /Q /F "%temp%\$(ProjectName)*.zip"</Command>
     </PostBuildEvent>
     <CustomBuildStep>
       <Command>
       </Command>
     </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">
+    <PostBuildEvent>
+      <Command>msbuild.exe ..\$(ProjectName).sln /p:Configuration=Release /p:Platform="x86"
+DEL /Q /F "$(SolutionDir)\$(ProjectName)*.zip"
+DEL /Q /F "%temp%\$(ProjectName)*.zip"
+copy /Y "$(SolutionDir)\Win32\$(Configuration)\$(ProjectName).exe" "%temp%\$(ProjectName).exe"
+$env:PROJECTVERSION=(get-item %temp%\$(ProjectName).exe).VersionInfo.FileVersion 
+echo Project Version %PROJECTVERSION%
+powershell Compress-Archive "%temp%\$(ProjectName).exe %temp%\$(ProjectName)_$(PROJECTVERSION)_x86.zip"  -CompressionLevel Optimal -Force
+copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CAboutDlg.h" />
@@ -299,6 +343,9 @@ del /Q /F "%temp%\$(ProjectName)__x86.zip"
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\RegexAssistant.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="TodoAndNotest.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
