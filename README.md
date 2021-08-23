@@ -90,4 +90,6 @@ RegexAssistant requires two libraries (Boost and Scintilla).  These to libraries
 10.	Add context menu item to replace (or append) sample with multiple sets of examples designed for each pattern listed in the token  list
 11.	Add Build button which disables real time results
 12.	Add a build wizard option that will let user go step by step creating an expression.
+13.	Add logic to perform file find, rename, delete, & move based on the regex patterns
+14.	Add drag and drop logic for sample window.
 
