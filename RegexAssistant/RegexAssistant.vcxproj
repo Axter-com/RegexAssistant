@@ -264,7 +264,6 @@
     <PostBuildEvent>
       <Command>msbuild.exe ..\$(ProjectName).sln /p:Configuration=Release /p:Platform="x86"</Command>
       <Command>msbuild.exe ..\$(ProjectName).sln /p:Configuration=Release /p:Platform="x86"
-DEL /Q /F "$(SolutionDir)\$(ProjectName)*.zip"
 IF EXIST  "%temp%\$(ProjectName).exe" DEL /Q /F "%temp%\$(ProjectName).exe"
 copy /Y "$(SolutionDir)\$(Platform)\$(Configuration)\$(ProjectName).exe" "%temp%\$(ProjectName).exe"
 powershell $env:PROJECTVERSION=[string](get-item %temp%\$(ProjectName).exe).VersionInfo.FileVersion  ;  $env:PROJECTCOMPRESSFILENAME=[string]::Concat("'%temp%\$(ProjectName)_v'",[string]$env:PROJECTVERSION,"'_$(Platform).zip'")   ;  Compress-Archive "%temp%\$(ProjectName).exe" "$env:PROJECTCOMPRESSFILENAME" -CompressionLevel Optimal -Force
