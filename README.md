@@ -7,7 +7,7 @@ RegexAssistant has an easy to use GUI that can build and test regex. As the user
 It has a cheatsheet token window which list the main regex tokens and common patterns. Items in the token list can be inserted into the Expression (regex) field by double clicking the desired token.
 
 ## Downloads
-Use the following link to download the latest release binaries: [Download](https://github.com/David-Maisonave/RegexAssistant/releases/tag/0.1)
+Use the following link to download the latest release binaries: [Download](https://github.com/David-Maisonave/RegexAssistant/releases/tag/v0.1.0.2)
 
 [![Screenshot1](Docs/ProjectImages/RegexAssistant_DefaultStartupScreen.png)](https://github.com/David-Maisonave/RegexAssistant)
 
