@@ -10,7 +10,9 @@ It has a cheat-sheet token window which list the main regex tokens and common pa
 Use the following link to download the latest release binaries: [Download](https://github.com/David-Maisonave/RegexAssistant/releases/tag/v0.1.0.2)
 
 ## Features
-[![Screenshot1](Docs/ProjectImages/RegexAssistant_DefaultStartupScreen.png)](https://github.com/David-Maisonave/RegexAssistant)
+[![Screenshot0](Docs/ProjectImages/RegexAssistant_DefaultStartupScreen.png)](https://github.com/David-Maisonave/RegexAssistant)
+
+[![Screenshot1](Docs/ProjectImages/RegexAssistantInAction.gif)](https://github.com/David-Maisonave/RegexAssistant)
 
 ### Real time results
 The results are displayed in real time to quickly let the user see when an expression is working, and exactly when it stops working.
