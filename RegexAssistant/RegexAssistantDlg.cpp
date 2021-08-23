@@ -387,8 +387,9 @@ void CRegexAssistantDlg::OnBnClickedConvertSqlWildToRegexButton()
 {
 	CString CurrentText;
 	m_RegexEditBox.GetWindowText( CurrentText );
-	if ( CurrentText.Find( _T( '#' ) ) != -1 || CurrentText.Find( _T( '?' ) ) != -1 || CurrentText.Find( _T( '*' ) ) != -1 || CurrentText.Find( _T( '%' ) ) != -1 )
+	if ( CurrentText.Find( _T( '_' ) ) != -1 || CurrentText.Find( _T( '#' ) ) != -1 || CurrentText.Find( _T( '?' ) ) != -1 || CurrentText.Find( _T( '*' ) ) != -1 || CurrentText.Find( _T( '%' ) ) != -1 )
 	{
+		CurrentText.Replace( _T( "_" ), _T( "." ) );
 		CurrentText.Replace( _T( "#" ), _T( "[0-9]" ) );
 		CurrentText.Replace( _T( "?" ), _T( "." ) );
 		CurrentText.Replace( _T( "*" ), _T( "\\w*" ) );
