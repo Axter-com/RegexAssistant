@@ -38,24 +38,21 @@ enum
 
 const RegexCompatibilityProperties CRegexAssistantDlg::m_RegexCompatibilityProperties[] =
 {
-{_T( "POSIX" ), REGEX_COMPATIBILITY_SCINTILLAPOSIX, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_POSIX), TRUE, "POSIX", "Scintilla POSIX syntax", RGB_YELLOW},
+{_T( "POSIX" ), REGEX_COMPATIBILITY_SCINTILLA_POSIX, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_POSIX), TRUE, "POSIX", "Scintilla POSIX syntax", RGB_YELLOW},
 {_T( "All" ), REGEX_COMPATIBILITY_ALL, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE),  NOT_IMPLEMENTED}, //Works with most regex syntax. In the backend, some syntax gets converted to work with Boost All
-{_T( "ASCII" ), REGEX_COMPATIBILITY_SCINTILLAPOSIX, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_POSIX), TRUE, "ASCII", "Same as Scintilla POSIX", RGB_YELLOW},
-{_T( "Boost" ), REGEX_COMPATIBILITY_BOOST, REGEX_SUBSET_BOOST, TRUE, "Boost", "Default boost", RGB_Cyan},
-{_T( "Boost - All" ), REGEX_COMPATIBILITY_BOOST_ALL_STANDARD, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL ), TRUE, "BoostAll", "Boost with ALL selected", RGB_Cyan},
-{_T( "Boost - All Multiline" ), REGEX_COMPATIBILITY_BOOST_ALL_MULTILINE, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE), TRUE, "BoostAllMulti", "Boost with ALL and multiline selected", RGB_Cyan},
-{_T( "Boost (default)" ), REGEX_COMPATIBILITY_BOOST, REGEX_SUBSET_BOOST, TRUE, "BoostDefaultMultiline", "Boost default settings", RGB_Cyan},
-{_T( "Boost (default) Multiline" ), REGEX_COMPATIBILITY_BOOST_DEFAULT_MULTILINE, (REGEX_SUBSET_BOOST | REGEX_SUBSET_MULTILINE), TRUE, "BoostDefault", "Boost with multiline set", RGB_Cyan},
-{_T( "Boost Perl Multiline" ), REGEX_COMPATIBILITY_BOOST_PERL_MULTILINE, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL | REGEX_SUBSET_MULTILINE), TRUE, "BoostPerl", "Boost with Perl and Multiline set", RGB_Cyan},
+{_T( "Boost" ), REGEX_COMPATIBILITY_BOOST, REGEX_SUBSET_BOOST, TRUE, "Boost", "Default boost regex with flag regex_constants::format_default", RGB_Cyan},
+{_T( "Boost (default) Multiline" ), REGEX_COMPATIBILITY_BOOST_DEFAULT_MULTILINE, (REGEX_SUBSET_BOOST | REGEX_SUBSET_MULTILINE), TRUE, "BoostDefaultMultiline", "Boost with multiline set", RGB_Cyan},
+{_T( "Boost - All" ), REGEX_COMPATIBILITY_BOOST_ALL_STANDARD, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL ), TRUE, "BoostAll", "Boost with flag regex_constants::format_all", RGB_Cyan},
+{_T( "Boost - All Multiline" ), REGEX_COMPATIBILITY_BOOST_ALL_MULTILINE, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE), TRUE, "BoostAllMulti", "Boost with ALL (format_all) and multiline selected", RGB_Cyan},
+{_T( "Boost Perl Multiline" ), REGEX_COMPATIBILITY_BOOST_PERL_MULTILINE, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL | REGEX_SUBSET_MULTILINE), TRUE, "BoostPerl", "Boost with Perl (regex_constants::format_perl) and Multiline set", RGB_Cyan},
 {_T( "C++ Regex" ), REGEX_COMPATIBILITY_CPP, REGEX_SUBSET_STD_REGEX, TRUE, "C++", "C++ STD Regex", RGB_Orange},
-{_T( "Common" ), REGEX_COMPATIBILITY_BOOST_ALL_MULTILINE, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE), TRUE, "Common", "Common modern regex syntax (Boost All) with multiline", RGB_Cyan},
 {_T( "ECMAScript" ), REGEX_COMPATIBILITY_ECMAScript, REGEX_SUBSET_STD_REGEX, TRUE, "ECMAScript", "ECMAScript via C++ Regex", RGB_Orange},
 {_T( "Groovy" ), REGEX_COMPATIBILITY_GROOVY, REGEX_SUBSET_JAVA, NOT_IMPLEMENTED},// Same as Java
 {_T( "Java" ), REGEX_COMPATIBILITY_JAVA, REGEX_SUBSET_JAVA, NOT_IMPLEMENTED},//Try implementing java code in this application, or do conversions with boost all
-{_T( "JavaScript" ), REGEX_COMPATIBILITY_JAVASCRIPT, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL), TRUE, "JavaScript", "JavaScript uses syntax similar to Perl.  Using Boost Perl to emulate JavaScript Regex.", RGB_Cyan},
+{_T( "JavaScript" ), REGEX_COMPATIBILITY_JAVASCRIPT, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL), TRUE, "JavaScript", "JavaScript uses syntax similar to Perl.  Using Boost Perl (regex_constants::format_perl) to emulate JavaScript Regex.", RGB_Cyan},
 {_T( ".Net" ), REGEX_COMPATIBILITY_DOTNET, REGEX_SUBSET_DOTNET, NOT_IMPLEMENTED},//Try to include .net implementation for regex
 {_T( "PCRE2" ), REGEX_COMPATIBILITY_PCRE2, REGEX_SUBSET_PCRE2, NOT_IMPLEMENTED},//C++ PCRE2
-{_T( "Perl" ), REGEX_COMPATIBILITY_PERL, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL), TRUE, "Perl", "Perl via Boost Perl", RGB_Cyan},
+{_T( "Perl" ), REGEX_COMPATIBILITY_PERL, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL), TRUE, "Perl", "Perl via Boost Perl (regex_constants::format_perl)", RGB_Cyan},
 {_T( "PHP" ), REGEX_COMPATIBILITY_PHP, REGEX_SUBSET_PCRE2, NOT_IMPLEMENTED},//Use with PCRE2, but add conversion for PHP search are replace syntax
 {_T( "POSIX_ERE" ), REGEX_COMPATIBILITY_POSIX_ERE, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_POSIX), NOT_IMPLEMENTED}, //DO CONVERSIONS ON POSIX CLASS with Scentilla POSIX
 {_T( "POSIX_BRE" ), REGEX_COMPATIBILITY_POSIX_BRE, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_UNIX_OLD_SYNTAX), TRUE, "", "Old UNIX style regex", RGB_YELLOW},
@@ -64,13 +61,12 @@ const RegexCompatibilityProperties CRegexAssistantDlg::m_RegexCompatibilityPrope
 {_T( "R" ), REGEX_COMPATIBILITY_R, REGEX_SUBSET_PCRE2, NOT_IMPLEMENTED},//Use with PCRE2, but add conversion for R replacement syntax
 {_T( "RE2" ), REGEX_COMPATIBILITY_RE2, REGEX_SUBSET_RE2, NOT_IMPLEMENTED},//Use RE2 library
 {_T( "RUBY" ), REGEX_COMPATIBILITY_RUBY, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL | REGEX_SUBSET_MULTILINE), NOT_IMPLEMENTED},//use boost perl, plus added conversion
-{_T( "Scintilla" ), REGEX_COMPATIBILITY_Scintilla, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_UNIX_OLD_SYNTAX), TRUE, "Scintilla", "Default Scintilla", RGB_YELLOW},
-{_T( "SCINTILLAPOSIX" ), REGEX_COMPATIBILITY_SCINTILLAPOSIX, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_POSIX), TRUE, "POSIX", "Scintilla POSIX syntax", RGB_YELLOW},
-{_T( "SED" ), REGEX_COMPATIBILITY_SED, (REGEX_SUBSET_BOOST | REGEX_SUBSET_SED), TRUE, "SED", "SED via Boost SED", RGB_Cyan},
-{_T( "SED C++" ), REGEX_COMPATIBILITY_CPP_REGEX_SED, (REGEX_SUBSET_STD_REGEX | REGEX_SUBSET_SED), TRUE, "SED", "SED via C++ STD Regex SED", RGB_Orange},
-{_T( "TCL" ), REGEX_COMPATIBILITY_TCL, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL), TRUE, "TCL", "TCL via Boost Perl", RGB_Cyan},
-{_T( "UNIX (Old)" ), REGEX_COMPATIBILITY_Scintilla, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_UNIX_OLD_SYNTAX), TRUE, "UNIX", "Old UNIX Style (Default Scintilla)", RGB_YELLOW},
-{_T( "VBSCRIPT" ), REGEX_COMPATIBILITY_VBSCRIPT, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL), TRUE, "VBSCRIPT", "Using Boost Perl to emulate VBSCRIPT Regex.", RGB_Cyan},//Same as javascript
+{_T( "Scintilla" ), REGEX_COMPATIBILITY_Scintilla, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_UNIX_OLD_SYNTAX), TRUE, "Scintilla", "Default Scintilla. Uses Old UNIX regex syntax", RGB_YELLOW},
+{_T( "Scintilla POSIX" ), REGEX_COMPATIBILITY_SCINTILLAPOSIX, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_POSIX), TRUE, "POSIX", "Scintilla POSIX syntax", RGB_YELLOW},
+{_T( "SED" ), REGEX_COMPATIBILITY_SED, (REGEX_SUBSET_BOOST | REGEX_SUBSET_SED), TRUE, "SED", "SED via Boost SED (regex_constants::format_sed)", RGB_Cyan},
+{_T( "SED C++" ), REGEX_COMPATIBILITY_CPP_REGEX_SED, (REGEX_SUBSET_STD_REGEX | REGEX_SUBSET_SED), TRUE, "SED", "SED via C++ STD Regex SED (regex_constants::format_sed)", RGB_Orange},
+{_T( "TCL" ), REGEX_COMPATIBILITY_TCL, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL), TRUE, "TCL", "TCL via Boost Perl (regex_constants::format_perl)", RGB_Cyan},
+{_T( "VBSCRIPT" ), REGEX_COMPATIBILITY_VBSCRIPT, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL), TRUE, "VBSCRIPT", "Using Boost Perl to emulate VBSCRIPT Regex. (regex_constants::format_perl)", RGB_Cyan},//Same as javascript
 { _T( "VIM" ), REGEX_COMPATIBILITY_VIM, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE), NOT_IMPLEMENTED},//Do conversions with boost all   "Old UNIX Style (Default Scintilla)"
 #ifdef _DEBUG //The following are for test purposes only.
 {_T( "Testing 1 A Wide String in ComboBox1" ), REGEX_COMPATIBILITY_DUMMY1, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE), TRUE, "FooFoo1", "", RGB_Lime},
