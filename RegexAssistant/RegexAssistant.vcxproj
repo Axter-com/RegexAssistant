@@ -134,14 +134,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\boost;..\scintilla;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26495</DisableSpecificWarnings>
+      <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <RegisterOutput>true</RegisterOutput>
       <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -164,14 +165,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\boost;..\scintilla;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26495</DisableSpecificWarnings>
+      <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <RegisterOutput>true</RegisterOutput>
       <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -196,9 +198,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\boost;..\scintilla;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26495</DisableSpecificWarnings>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -206,7 +209,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <RegisterOutput>true</RegisterOutput>
       <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <Midl>
@@ -236,9 +239,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\boost;..\scintilla;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26495</DisableSpecificWarnings>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -246,7 +250,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <RegisterOutput>true</RegisterOutput>
       <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <Midl>
@@ -290,6 +294,54 @@ powershell Compress-Archive "%temp%\$(ProjectName).exe %temp%\$(ProjectName)_$(P
 copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
 </Command>
     </PostBuildEvent>
+    <ClCompile>
+      <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
+      <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <ClCompile>
+      <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
+      <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|ARM'">
+    <ClCompile>
+      <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
+      <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <ClCompile>
+      <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
+      <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">
+    <ClCompile>
+      <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
+      <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CAboutDlg.h" />
@@ -298,6 +350,7 @@ copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
     <ClInclude Include="cxxopts.hpp" />
     <ClInclude Include="DlgProxy.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="mfcx.ComboBox.h" />
     <ClInclude Include="MultiMonitors.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RegexAssistant.h" />
@@ -314,6 +367,7 @@ copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
     <ClCompile Include="CAboutDlg.cpp" />
     <ClCompile Include="CommonFunction.cpp" />
     <ClCompile Include="DlgProxy.cpp" />
+    <ClCompile Include="mfcx.ComboBox.cpp" />
     <ClCompile Include="MultiMonitors.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

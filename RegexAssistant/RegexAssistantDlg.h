@@ -1,21 +1,39 @@
+/*
+	Copyright (C) 2021  David Maisonave
+	The RegexAssistant source code is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License.
+	This program is distributed in the hope that it will be useful,	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+*/
 
 // RegexAssistantDlg.h : header file
 #pragma once
 #include "RegexAssistant.h"
 #include <vector>
+#include <map>
 #include <string>
 #include "SizingDialog.h"
 #include "ScintillaWrapper.h"
+#include "mfcx.ComboBox.h"
+#include <boost/xpressive/xpressive.hpp>
 
 
 #define REPORT_ERR_AND_EXIT(exit_err_no, msg_format, ...) {CString msg; msg.Format(_T("Error:  " msg_format "  Performming early exit due to error."),__VA_ARGS__);AfxMessageBox(msg);exit(exit_err_no);}
 class CRegexAssistantDlgAutoProxy;
-
 struct MARKERDATAtag
 {
 	COLORREF	TextColor;
 	COLORREF	BkColor;
 	BOOL		MarkLine;
+};
+
+struct RegexCompatibilityProperties
+{
+	CString Name; // Name shown on the GUI dropdown list
+	enum Regex_Compatibility regex_compatibility_ID; //ID unique to this option
+	int regex_compatibility_basecode; //Base implementation
+	BOOL IsItemEnabled; // Set true if fully implemented or compiling in debug mode.
+	std::string CommandLineOption; // string used on command line to select this compatibility
+	std::string HelpTip; // Summary of type
+	int HighLightIndexID;
 };
 
 class CRegexAssistantDlg :	public CSizingDialog 
@@ -26,10 +44,15 @@ class CRegexAssistantDlg :	public CSizingDialog
 	static const int QtyColumnsInLinst;
 	static const int MaxInsertItemsList;
 	static const CString InsertItemsList[];
+	static const CString m_CompatibilityComboBoxSelections[];
+	static const CString m_DefaultTestTargetTextData;
+	static const MARKERDATAtag m_MarkerData[];
 public:
 	CRegexAssistantDlg(CString regex_search, CString regex_replace, CString Sample, CRegexAssistantApp::SampleLoadMethod sampleloadmethod, 
 						int MonitorToDisplay, Regex_Compatibility regex_compatibility, CWnd* pParent = nullptr);
 	virtual ~CRegexAssistantDlg();
+	static const RegexCompatibilityProperties m_RegexCompatibilityProperties[];
+
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_REGEXASSISTANT_DIALOG };
 #endif
@@ -38,47 +61,66 @@ protected:
 	virtual BOOL OnNotify( WPARAM wParam, LPARAM lParam, LRESULT* pResult );
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 	virtual BOOL OnInitDialog();
-	void OnEnChangeRegexEditBox( CString MarkString, int FieldId, bool ClearMarkers, DWORD Flag = 0, int TargetLineNo = -1 );
+	void OnEnChangeRegexEditBox( CString MarkString, DWORD Flag = 0);
 	void OnEnChangeRegexEditBox_LineByLine( CString MarkString );
 	void OnEnChangeRegexEditBox_BodyMethod( CString MarkString );
 	void UpdateWindowTitle();
 	void UpdateConversionButtonEnableStatus( CString MarkString );
+	void RegexReplace_Scintilla( CString MarkString, CString NeedleReplacementCstr );
 	void RegexReplace_BodyMethod( CString MarkString, CString NeedleReplacementCstr );
 	void RegexReplace_LineByLine( CString MarkString, CString NeedleReplacementCstr );
-	static bool IsBoostRegex( Regex_Compatibility regex_compalibility );
-	static bool IsBoostOrStd_Regex( Regex_Compatibility regex_compalibility );
-	static bool IsScintillaRegex( Regex_Compatibility regex_compalibility );
-
+	void FetchTextForUndoArray();
+	void PopulateTokenList();
+	BOOL CanExit();
+	int GetMarkerID();
+	bool IsStd_Regex();
+	bool IsBoostRegex();
+	bool IsBoostDefaultRegex();
+	bool IsBoostAllRegex();
+	bool IsBoostOrStd_Regex();
+	bool IsScintillaRegex();
+	bool IsScintillaStandardRegex();
+	bool IsStd_Regex( Regex_Compatibility regex_compalibility );
+	bool IsBoostRegex( Regex_Compatibility regex_compalibility );
+	bool IsBoostOrStd_Regex( Regex_Compatibility regex_compalibility );
+	bool IsScintillaRegex( Regex_Compatibility regex_compalibility );
+	bool IsNotCompatibleWithBackSlashReplacementToken();
+	bool IsNotCompatibleWithDollarSignReplacementToken();
+	bool IsPOSIX();
+	bool IsSED();
+	bool IsPerl();
+	bool IsMultiline();
+	bool IsUNIX_OLD_SYNTAX();
+	boost::xpressive::regex_constants::match_flag_type GetBoostCompatibilityFlag( Regex_Compatibility regex_compatibility );
+	wchar_t *m_py_decodelocale;
+	std::string m_OriginalSampleValue;
+	std::vector<CString> m_RegexList;
+	std::vector<std::string> m_UndoSource;
+	//std::map<Regex_Compatibility, RegexCompatibilityProperties> m_CompatibilityProperties;
 	CString m_CurrentText;
-	int m_FieldId;
+	CString m_TestTargetTextData;
+	int m_MaxViewWidth;
+	int m_MonitorToDisplay;
 	BOOL m_bCase;
-	BOOL m_EnableRegexCompatibilityOption;
+	bool m_bMakingChangeByReplacementLogic;
+	DWORD lastErr;
 	Regex_Compatibility m_Regex_Compalibility;
 	ScintillaWrapper m_ScintillaWrapper;
-	int m_MaxViewWidth;
-	std::vector<CString> m_RegexList;
-	static MARKERDATAtag m_MarkerData[NUM_OF_MARKERS];
-	std::vector<std::string> m_UndoSource;
-	bool m_bMakingChangeByReplacementLogic;
 	CRegexAssistantDlgAutoProxy* m_pAutoProxy;
+	CRegexAssistantApp::SampleLoadMethod m_SampleLoadMethod;
 	HICON m_hIcon;
-	BOOL CanExit();
 	CEdit m_RegexEditBox;
 	CListCtrl m_TokenListCtrl;
+	mfcx::ComboBox m_RegexCompatibility_cmbx;
+	CEdit m_ReplaceWithBox;
+	CStatic m_ReplaceWithStaticText;
+	CStatic m_GroupBoxToken;
 	CButton m_Case;
-	CString m_TestTargetTextData;
-	static const CString m_DefaultTestTargetTextData;
-	CComboBox m_RegexCompatibility_cmbx;
+	CButton m_ReplaceButton;
+	CButton m_ReplaceUndoButton;
 	CButton m_ConvertSqlWildToRegex_btn;
 	CButton m_ConvertFilesysWildToRegex_btn;
-	CEdit m_ReplaceWithBox;
-	CButton m_ReplaceButton;
-	CStatic m_ReplaceWithStaticText;
-	CButton m_ReplaceUndoButton;
-	CStatic m_GroupBoxToken;
-	DWORD lastErr;
-	int m_MonitorToDisplay;
-	CRegexAssistantApp::SampleLoadMethod m_SampleLoadMethod;
+	CButton m_ResetButton;
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -98,4 +140,5 @@ public:
 	afx_msg void OnBnClickedStaticGroupboxTestTargetText();
 	inline virtual void OnOK() { OnClose(); };
 	inline virtual void OnCancel() { OnClose(); };
+	afx_msg void OnBnClickedResetSample();
 };

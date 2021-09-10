@@ -1,0 +1,1 @@
+This is a place holder for future documentation.  Currently it holds images used for Github RegexAssistant web page.

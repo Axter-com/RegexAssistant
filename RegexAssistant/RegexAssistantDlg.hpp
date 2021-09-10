@@ -1,34 +1,107 @@
 //Note: This file should only be included in RegexAssistantDlg.cpp
 //Initialize static members of CRegexAssistantDlg
-MARKERDATAtag CRegexAssistantDlg::m_MarkerData[NUM_OF_MARKERS] = {
-	{RGB( 0, 0, 0 )/*Black*/, RGB( 0, 255, 0 )/*Lime*/, FALSE},
-{RGB( 0, 0, 0 )/*Black*/, RGB( 255, 255, 0 )/*Yellow*/, FALSE},
-{RGB( 0, 0, 205 )/*blue3*/, RGB( 255, 255, 0 )/*Yellow*/, FALSE},
-{RGB( 0, 0, 0 )/*Black*/, RGB( 0, 255, 0 )/*Lime*/, FALSE},
-{RGB( 0, 0, 0 )/*Black*/, RGB( 0, 255, 0 )/*Lime*/, FALSE},
-{RGB( 0, 0, 0 )/*Black*/, RGB( 0, 255, 0 )/*Lime*/, FALSE},
-{RGB( 0, 0, 0 )/*Black*/, RGB( 0, 255, 0 )/*Lime*/, FALSE},
-{RGB( 0, 0, 0 )/*Black*/, RGB( 0, 255, 255 )/*Cyan*/, FALSE},
-{RGB( 0, 0, 0 )/*Black*/, RGB( 0, 255, 255 )/*Cyan*/, FALSE},
-{RGB( 0, 0, 0 /*Black*/ ), RGB( 255, 128, 0 )/*Orange*/, FALSE}
+const MARKERDATAtag CRegexAssistantDlg::m_MarkerData[] = {
+	{RGB( 0, 0, 0 )/*Black*/, RGB( 0, 255, 0 )/*Lime*/, FALSE},       //(Green) For Boost
+	{RGB( 0, 0, 0 )/*Black*/, RGB( 255, 255, 0 )/*Yellow*/, FALSE},   // For REGEX_COMPATIBILITY_SCINTILLA_POSIX
+	{RGB( 0, 0, 0 )/*Black*/, RGB( 0, 255, 255 )/*Cyan*/, FALSE},     //For STD Regex and STD SED
+	{RGB( 0, 0, 0 /*Black*/ ), RGB( 255, 128, 0 )/*Orange*/, FALSE},  //For REGEX_COMPATIBILITY_SCINTILLA
+	{RGB( 0, 0, 0 /*Black*/ ), RGB( 254, 185, 170 )/*Pink*/, FALSE }  //For Java
+};
+
+enum
+{
+	RGB_Lime,
+	RGB_YELLOW,
+	RGB_Cyan,
+	RGB_Orange,
+	RGB_Pink,
+	NUM_OF_MARKERS,
+
+	REGEX_SUBSET_SCINTILLA			= 128,		//See https://www.scintilla.org/SciTERegEx.html
+	REGEX_SUBSET_BOOST				= 256,
+	REGEX_SUBSET_BOOST_ALL			= 512,
+	REGEX_SUBSET_STD_REGEX			= 2048,
+	REGEX_SUBSET_PCRE2				= 4096,
+	REGEX_SUBSET_RE2				= 8192,
+	REGEX_SUBSET_DOTNET				= 16384,
+	REGEX_SUBSET_PYTHON				= 32768,
+	REGEX_SUBSET_JAVA				= 65536,
+
+	REGEX_SUBSET_UNIX_OLD_SYNTAX	= 131072,
+	REGEX_SUBSET_PERL				= 262144,
+	REGEX_SUBSET_MULTILINE			= 524288,
+	REGEX_SUBSET_SED				= 1048576,
+	REGEX_SUBSET_POSIX				= 2097152
+};
+
+#define NOT_IMPLEMENTED FALSE, "", "Awaiting Implementation", 0
+
+const RegexCompatibilityProperties CRegexAssistantDlg::m_RegexCompatibilityProperties[] =
+{
+{_T( "POSIX" ), REGEX_COMPATIBILITY_SCINTILLAPOSIX, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_POSIX), TRUE, "POSIX", "Scintilla POSIX syntax", RGB_YELLOW},
+{_T( "All" ), REGEX_COMPATIBILITY_ALL, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE),  NOT_IMPLEMENTED}, //Works with most regex syntax. In the backend, some syntax gets converted to work with Boost All
+{_T( "ASCII" ), REGEX_COMPATIBILITY_SCINTILLAPOSIX, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_POSIX), TRUE, "ASCII", "Same as Scintilla POSIX", RGB_YELLOW},
+{_T( "Boost" ), REGEX_COMPATIBILITY_BOOST, REGEX_SUBSET_BOOST, TRUE, "Boost", "Default boost", RGB_Cyan},
+{_T( "Boost - All" ), REGEX_COMPATIBILITY_BOOST_ALL_STANDARD, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL ), TRUE, "BoostAll", "Boost with ALL selected", RGB_Cyan},
+{_T( "Boost - All Multiline" ), REGEX_COMPATIBILITY_BOOST_ALL_MULTILINE, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE), TRUE, "BoostAllMulti", "Boost with ALL and multiline selected", RGB_Cyan},
+{_T( "Boost (default)" ), REGEX_COMPATIBILITY_BOOST, REGEX_SUBSET_BOOST, TRUE, "BoostDefaultMultiline", "Boost default settings", RGB_Cyan},
+{_T( "Boost (default) Multiline" ), REGEX_COMPATIBILITY_BOOST_DEFAULT_MULTILINE, (REGEX_SUBSET_BOOST | REGEX_SUBSET_MULTILINE), TRUE, "BoostDefault", "Boost with multiline set", RGB_Cyan},
+{_T( "Boost Perl Multiline" ), REGEX_COMPATIBILITY_BOOST_PERL_MULTILINE, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL | REGEX_SUBSET_MULTILINE), TRUE, "BoostPerl", "Boost with Perl and Multiline set", RGB_Cyan},
+{_T( "C++ Regex" ), REGEX_COMPATIBILITY_CPP, REGEX_SUBSET_STD_REGEX, TRUE, "C++", "C++ STD Regex", RGB_Orange},
+{_T( "Common" ), REGEX_COMPATIBILITY_BOOST_ALL_MULTILINE, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE), TRUE, "Common", "Common modern regex syntax (Boost All) with multiline", RGB_Cyan},
+{_T( "ECMAScript" ), REGEX_COMPATIBILITY_ECMAScript, REGEX_SUBSET_STD_REGEX, TRUE, "ECMAScript", "ECMAScript via C++ Regex", RGB_Orange},
+{_T( "Groovy" ), REGEX_COMPATIBILITY_GROOVY, REGEX_SUBSET_JAVA, NOT_IMPLEMENTED},// Same as Java
+{_T( "Java" ), REGEX_COMPATIBILITY_JAVA, REGEX_SUBSET_JAVA, NOT_IMPLEMENTED},//Try implementing java code in this application, or do conversions with boost all
+{_T( "JavaScript" ), REGEX_COMPATIBILITY_JAVASCRIPT, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL), TRUE, "JavaScript", "JavaScript uses syntax similar to Perl.  Using Boost Perl to emulate JavaScript Regex.", RGB_Cyan},
+{_T( ".Net" ), REGEX_COMPATIBILITY_DOTNET, REGEX_SUBSET_DOTNET, NOT_IMPLEMENTED},//Try to include .net implementation for regex
+{_T( "PCRE2" ), REGEX_COMPATIBILITY_PCRE2, REGEX_SUBSET_PCRE2, NOT_IMPLEMENTED},//C++ PCRE2
+{_T( "Perl" ), REGEX_COMPATIBILITY_PERL, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL), TRUE, "Perl", "Perl via Boost Perl", RGB_Cyan},
+{_T( "PHP" ), REGEX_COMPATIBILITY_PHP, REGEX_SUBSET_PCRE2, NOT_IMPLEMENTED},//Use with PCRE2, but add conversion for PHP search are replace syntax
+{_T( "POSIX_ERE" ), REGEX_COMPATIBILITY_POSIX_ERE, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_POSIX), NOT_IMPLEMENTED}, //DO CONVERSIONS ON POSIX CLASS with Scentilla POSIX
+{_T( "POSIX_BRE" ), REGEX_COMPATIBILITY_POSIX_BRE, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_UNIX_OLD_SYNTAX), TRUE, "", "Old UNIX style regex", RGB_YELLOW},
+{_T( "POWERSHELL" ), REGEX_COMPATIBILITY_POWERSHELL, REGEX_SUBSET_DOTNET, NOT_IMPLEMENTED},//Use .net implementation
+{_T( "PYTHON" ), REGEX_COMPATIBILITY_PYTHON, REGEX_SUBSET_PYTHON, NOT_IMPLEMENTED},//Try to include python code to do the regex
+{_T( "R" ), REGEX_COMPATIBILITY_R, REGEX_SUBSET_PCRE2, NOT_IMPLEMENTED},//Use with PCRE2, but add conversion for R replacement syntax
+{_T( "RE2" ), REGEX_COMPATIBILITY_RE2, REGEX_SUBSET_RE2, NOT_IMPLEMENTED},//Use RE2 library
+{_T( "RUBY" ), REGEX_COMPATIBILITY_RUBY, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL | REGEX_SUBSET_MULTILINE), NOT_IMPLEMENTED},//use boost perl, plus added conversion
+{_T( "Scintilla" ), REGEX_COMPATIBILITY_Scintilla, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_UNIX_OLD_SYNTAX), TRUE, "Scintilla", "Default Scintilla", RGB_YELLOW},
+{_T( "SCINTILLAPOSIX" ), REGEX_COMPATIBILITY_SCINTILLAPOSIX, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_POSIX), TRUE, "POSIX", "Scintilla POSIX syntax", RGB_YELLOW},
+{_T( "SED" ), REGEX_COMPATIBILITY_SED, (REGEX_SUBSET_BOOST | REGEX_SUBSET_SED), TRUE, "SED", "SED via Boost SED", RGB_Cyan},
+{_T( "SED C++" ), REGEX_COMPATIBILITY_CPP_REGEX_SED, (REGEX_SUBSET_STD_REGEX | REGEX_SUBSET_SED), TRUE, "SED", "SED via C++ STD Regex SED", RGB_Orange},
+{_T( "TCL" ), REGEX_COMPATIBILITY_TCL, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL), TRUE, "TCL", "TCL via Boost Perl", RGB_Cyan},
+{_T( "UNIX (Old)" ), REGEX_COMPATIBILITY_Scintilla, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_UNIX_OLD_SYNTAX), TRUE, "UNIX", "Old UNIX Style (Default Scintilla)", RGB_YELLOW},
+{_T( "VBSCRIPT" ), REGEX_COMPATIBILITY_VBSCRIPT, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL), TRUE, "VBSCRIPT", "Using Boost Perl to emulate VBSCRIPT Regex.", RGB_Cyan},//Same as javascript
+{ _T( "VIM" ), REGEX_COMPATIBILITY_VIM, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE), NOT_IMPLEMENTED},//Do conversions with boost all   "Old UNIX Style (Default Scintilla)"
+#ifdef _DEBUG //The following are for test purposes only.
+{_T( "Testing 1 A Wide String in ComboBox1" ), REGEX_COMPATIBILITY_DUMMY1, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE), TRUE, "FooFoo1", "", RGB_Lime},
+{_T( "Testing 2 A Wide String in ComboBox2" ), REGEX_COMPATIBILITY_DUMMY2, (REGEX_SUBSET_BOOST |  REGEX_SUBSET_MULTILINE), TRUE, "FooFoo2", "More Foo Foo2", RGB_YELLOW},
+{_T( "Testing 3 A Wide String in ComboBox3" ), REGEX_COMPATIBILITY_DUMMY3, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL ), TRUE, "FooFoo3", "", RGB_Cyan},
+{_T( "Testing 4 A Wide String in ComboBox4" ), REGEX_COMPATIBILITY_DUMMY4, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE), TRUE, "FooFoo4", "More Foo Foo4", RGB_Orange},
+{_T( "Testing 5 A Wide String in ComboBox5" ), REGEX_COMPATIBILITY_DUMMY5, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_POSIX), TRUE, "FooFoo5", "More Foo Foo5", RGB_Pink}
+#endif
 };
 
 #define INSERT_ITEMS_LIST( _a, _b, _c, _d )		_T(_b), _T(_a), _T(_c), _T(_d)
 const CString CRegexAssistantDlg::InsertItemsList[] =
 {
-	//Item starting with *, are patterns which can only be used with filter, which uses boost regex logic
+	//Item starting with *, are patterns which can only be used with std::regex or boost regex
 	INSERT_ITEMS_LIST( "Any single character", ".", "a.c", "abc, aac, acc, adc, aec, ..." ),
-	INSERT_ITEMS_LIST( "Zero or more character(s)", ".*", "comm.*", "commercial ventures, commerce activity" ),
-	INSERT_ITEMS_LIST( "Zero or more character(s), no white space", "\\w*", "comm.\\w*", "commercial, commerce, community" ),
 	INSERT_ITEMS_LIST( "0 or more of previous expression", "*", "ab*c", "ac, abc, abbc, abbbc, ..." ),
-	INSERT_ITEMS_LIST( "1 or more of previous expression", "+", "ab+c", "abc, abbc, abbbc, ..." ),
 	INSERT_ITEMS_LIST( "0 or 1 of previous expression", "?", "ab?c", "ac, abc" ),
+	INSERT_ITEMS_LIST( "1 or more of previous expression", "+", "ab+c", "abc, abbc, abbbc, ..." ),
 	INSERT_ITEMS_LIST( "Start of a string", "^", "^abc", "abc, abcdefg, abc123, ..." ),
 	INSERT_ITEMS_LIST( "End of a string", "$", "abc$", "abc, endsinabc, 123abc, ..." ),
-	INSERT_ITEMS_LIST( "*Word Boundary", "\\b", "\\babc\\b", "abc" ),
-	INSERT_ITEMS_LIST( "Word", "\\w+", "\\w+", "abc, defg, foo3, foo_123" ),
+	INSERT_ITEMS_LIST( "Choice operator matches either the expression before or after the operator", "|", "abc|def", "abc, def" ),
 	INSERT_ITEMS_LIST( "White space", "\\s", "a\\sc", "a c" ),
-	INSERT_ITEMS_LIST( "Matches any non-white-space character", "\\S", "axter\\Scom", "axter.com, axter-com" ),
+	INSERT_ITEMS_LIST( "Matches any non-white-space. Same as [^\\s]", "\\S", "axter\\Scom", "axter.com, axter-com" ),
+	INSERT_ITEMS_LIST( "Single digit. Same as [0-9]", "\\d", "cat\\dfood", "cat8food, cat9food, cat2food, cat1food" ),
+	INSERT_ITEMS_LIST( "Excludes digits. Same as [^0-9]", "\\D", "cat\\Dfood", "cat_food, catifood, cat-food, cat food" ),
+	INSERT_ITEMS_LIST( "Any single letter, digit, or underscore. Same as [A-Za-z0-9_]", "\\w", "cat\\wfood", "cat8food, cat_food, catQfood, catifood" ),
+	INSERT_ITEMS_LIST( "Exludes letter, digit, or underscore. Same as [^A-Za-z0-9_]", "\\W", "cat\\Wfood", "cat food, cat&food, cat-food, cat.food" ),
+	INSERT_ITEMS_LIST( "*Word Boundary", "\\b", "\\babc\\b", "abc" ),
+	INSERT_ITEMS_LIST( "Zero or more characters", ".*", "comm.*", "commercial ventures, commerce activity" ),
+	INSERT_ITEMS_LIST( "Zero or more character(s), no white space", "\\w*", "comm.\\w*", "commercial, commerce, community" ),
+	INSERT_ITEMS_LIST( "(Word) 1 or more character(s), no white space", "\\w+", "\\w+", "abc, defg, foo3, foo_123" ),
 	INSERT_ITEMS_LIST( "Any single digit", "[0-9]", "cat[0-9]ood", "cat3ood, cat8ood, cat2ood, ..." ),
 	INSERT_ITEMS_LIST( "Any single letter", "[a-zA-Z]", "cat[a-zA-Z]ood", "catfood, catHood, catwood" ),
 	INSERT_ITEMS_LIST( "Any single lowercase letter", "[a-z]", "cat[a-z]ood", "catfood, cathood, catwood" ),
@@ -76,14 +149,59 @@ const CString CRegexAssistantDlg::InsertItemsList[] =
 	INSERT_ITEMS_LIST( "Find function with 3 arguments pattern", "(func_name)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "(CreateFoo)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "CreateFoo(ArgData, arg2, arg3)" ),
 	INSERT_ITEMS_LIST( "Find function with 4 arguments pattern", "(func_name)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "(CreateFoo)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "CreateFoo(ArgData, arg2, arg3, arg4)" ),
 	INSERT_ITEMS_LIST( "Find function with 5 arguments pattern", "(func_name)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "(CreateFoo)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "CreateFoo(ArgData, arg2, arg3, arg4, arg5)" ),
-	//Item starting with ~, are patterns which can only be used with Markers, which uses Scintilla regex logic
-	//Item starting with $ in second column, are patterns which can only be used for replacement regex field, and when double clicked will get inserted into replacement field.
-	INSERT_ITEMS_LIST( "Function with 1 argument replacement pattern", "$\\1(\\2)", "", "" ),
-	INSERT_ITEMS_LIST( "Function with 2 arguments replacement pattern", "$\\1(\\2, \\3)", "", "" ),
-	INSERT_ITEMS_LIST( "Function with 3 arguments replacement pattern", "$\\1(\\2, \\3, \\4)", "", "" ),
-	INSERT_ITEMS_LIST( "Function with 4 arguments replacement pattern", "$\\1(\\2, \\3, \\4, \\5)", "", "" ),
-	INSERT_ITEMS_LIST( "Function with 5 arguments replacement pattern", "$\\1(\\2, \\3, \\4, \\5, \\6)", "", "" ),
+	//Item starting with ~, (\1\2) works with Boost Regex, Scintilla-Standard, POSIX, boost Perl, Boost Sed, STD SED
+	//Item starting with $, ($1$2) works with Boost Regex, boost Perl, Boost Multiline, boost default, STD regex
+	//Item starting with 1,2,or 3 in the second character of the second column, are patterns which can only be used for replacement regex field, and when double clicked will get inserted into replacement field.
+	INSERT_ITEMS_LIST( "~1st Argument for replacement token", "\\1", "", "" ),
+	INSERT_ITEMS_LIST( "~2nd Argument for replacement token", "\\2", "", "" ),
+	INSERT_ITEMS_LIST( "~3rd Argument for replacement token", "\\3", "", "" ),
+	INSERT_ITEMS_LIST( "$1st Argument for replacement token", "$1", "", "" ),
+	INSERT_ITEMS_LIST( "$2nd Argument for replacement token", "$2", "", "" ),
+	INSERT_ITEMS_LIST( "$3rd Argument for replacement token", "$3", "", "" ),
+	INSERT_ITEMS_LIST( "$Alternate syntax for replacement token", "$1($2)", "", "" ),
 	INSERT_ITEMS_LIST( "", "", "", "" )
+/*  Note: Scintilla standard uses following systax \(foo\)\(\S*\) and replacement boo\2 vs Scintilla POSIX uses syntax (foo)(\S*)
+	Test out the following VIM tokens, and if they down't work, see if they can get converted to Perl syntax
+		\_s 				[ \t\r\n\v\f] or \s
+		\u					[A-Z]
+		\l					[a-z]
+		\x					[A-Fa-f0-9]
+		\p					[\x20-\x7E]
+		\a					[A-Za-z]
+	
+	Check if the following java tokens can be converted to Perl syntax
+		\p{ASCII}			[\x00-\x7F]
+		\p{Alnum} 			[A-Za-z0-9]
+		\p{Alpha}			[A-Za-z]
+		\p{Blank} 			[ \t]
+		\p{Cntrl} 			[\x00-\x1F\x7F]
+		\p{Graph} 			[\x21-\x7E]
+		\p{Lower} 			[a-z]
+		\p{Print} 			[\x20-\x7E]
+		\p{Punct} 			[][!"#$%&'()*+,./:;<=>?@\^_`{|}~-]
+		\p{Upper} 			[A-Z]
+		\p{XDigit} 			[A-Fa-f0-9]
+		\p{Digit} or \d 	[0-9]
+		\p{Space} or \s 	[ \t\r\n\v\f]
+	
+	Check if the following POSIX tokens work or can be converted to Perl syntax
+		[:alnum:]			[A-Za-z0-9] 	Alphanumeric characters
+		[:alpha:]			[A-Za-z] 	Alphabetic characters
+		[:blank:]			[ \t] 	Space and tab
+		[:cntrl:]			[\x00-\x1F\x7F] 	Control characters
+		[:digit:]			[0-9] 	Digits
+		[:graph:]			[\x21-\x7E] 	Visible characters
+		[:lower:]			[a-z] 	Lowercase letters
+		[:print:]			[\x20-\x7E] 	Visible characters and the space character
+		[:punct:]			[][!"#$%&'()*+,./:;<=>?@\^_`{|}~-] 	Punctuation characters
+		[:space:]			[ \t\r\n\v\f] 	Whitespace characters
+		[:upper:]			[A-Z] 	Uppercase letters
+		[:xdigit:]			[A-Fa-f0-9] 	Hexadecimal digits
+		
+	*Non-standard
+		[:ascii:]			[\x00-\x7F] 	ASCII characters
+		[:word:]			[A-Za-z0-9_] 	Alphanumeric characters plus "_"
+*/
 };
 const int CRegexAssistantDlg::QtyColumnsInLinst = 4;
 const int CRegexAssistantDlg::MaxInsertItemsList = ((sizeof( InsertItemsList ) / sizeof( InsertItemsList[0] ))) / QtyColumnsInLinst;

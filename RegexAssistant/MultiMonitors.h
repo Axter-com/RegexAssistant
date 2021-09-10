@@ -5,6 +5,18 @@
 #include <vector>
 #include "Screen.h"
 
+/*********************************************************************************************
+Example Usage:
+----------------------------------------------------------------------------------------------
+#include "MultiMonitors.h"
+if ( m_MonitorToDisplay > 0 )
+{
+	MultiMonitors multimonitors;
+	multimonitors.MoveWindowToMonitor( this->m_hWnd, static_cast<UINT>(m_MonitorToDisplay) );
+}
+*********************************************************************************************/
+
+
 class MultiMonitorsData;
 
 class MultiMonitors

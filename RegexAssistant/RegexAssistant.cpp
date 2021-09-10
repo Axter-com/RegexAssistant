@@ -1,7 +1,8 @@
-
-// RegexAssistant.cpp : Defines the class behaviors for the application.
-//
-
+/*
+	Copyright (C) 2021  David Maisonave
+	The RegexAssistant source code is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License.
+	This program is distributed in the hope that it will be useful,	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+*/
 #include "pch.h"
 #include "framework.h"
 #include "RegexAssistantDlg.h"
@@ -9,6 +10,7 @@
 #include <string>
 #include <vector>
 #include "CommonFunctions.h"
+#include <stdlib.h>
 
 using namespace std;
 

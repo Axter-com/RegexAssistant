@@ -10,6 +10,14 @@
     #define LINUX 1
 #endif
 
+/**************************
+Example usage:
+---------------------------
+#include "ClipboardXX.hpp"
+	CClipboardXX clipboard;
+	std::string paste_text;
+	clipboard >> paste_text;
+**************************/
 
 class CExceptionXX : public std::exception{
     private:
