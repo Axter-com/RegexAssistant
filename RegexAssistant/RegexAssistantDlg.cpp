@@ -129,7 +129,7 @@ BOOL CRegexAssistantDlg::OnInitDialog()
 		m_Case.SetCheck( BST_CHECKED );
 	UpdateWindowTitle();
 	for ( int i = 0; i < sizeof( m_RegexCompatibilityProperties ) / sizeof( RegexCompatibilityProperties ); i++ )
-		m_RegexCompatibility_cmbx.AddString( m_RegexCompatibilityProperties[i].Name, m_RegexCompatibilityProperties[i].IsItemEnabled, FXString::ToTString(m_RegexCompatibilityProperties[i].HelpTip.c_str()) );
+		m_RegexCompatibility_cmbx.AddString( m_RegexCompatibilityProperties[i].Name, m_RegexCompatibilityProperties[i].IsItemEnabled, FXString::ToTString(m_RegexCompatibilityProperties[i].HelpTip.c_str()), mfcx::ComboBox::DEFAULT_COLORS, mfcx::ComboBox::DEFAULT_COLORS, m_MarkerData[m_RegexCompatibilityProperties[i].HighLightIndexID].TextColor, m_MarkerData[m_RegexCompatibilityProperties[i].HighLightIndexID].BkColor );
 	m_RegexCompatibility_cmbx.EnableToolTips();
 	m_RegexCompatibility_cmbx.SetCurSel( (int)m_Regex_Compalibility );
 	m_RegexCompatibility_cmbx.EnableWideStrPopup();

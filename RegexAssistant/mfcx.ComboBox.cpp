@@ -19,17 +19,50 @@ static char THIS_FILE[] = __FILE__;
 
 namespace mfcx
 {
+	COLORREF GetColor( COLORREF colorref, int DefaultID )
+	{
+		return (colorref == ComboBox::DEFAULT_COLORS) ? GetSysColor( DefaultID ) : colorref;
+	}
+
 	/////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////
 	// ComboBoxItemDetails class and implementation
 	class ComboBoxItemDetails
 	{
 	public:
-		ComboBoxItemDetails( BOOL isenabled, CString tooltipstr = _T( "" ) )
-			:IsEnabled( isenabled ), ToolTipStr( tooltipstr ){}
+		ComboBoxItemDetails( BOOL isenabled = TRUE, CString tooltipstr = _T(""),
+							 COLORREF DisabledColor = ComboBox::DEFAULT_COLORS, COLORREF DisabledBkColor = ComboBox::DEFAULT_COLORS,
+							 COLORREF EnabledColor = ComboBox::DEFAULT_COLORS, COLORREF EnabledBkColor = ComboBox::DEFAULT_COLORS,
+							 COLORREF EnabledSelectColor = ComboBox::DEFAULT_COLORS, COLORREF EnabledSelectBkColor = ComboBox::DEFAULT_COLORS )
+			:IsEnabled( isenabled ), ToolTipStr( tooltipstr )
+			, m_DisabledColor( DisabledColor ), m_DisabledBkColor( DisabledBkColor )
+			, m_EnabledColor( EnabledColor ), m_EnabledBkColor( EnabledBkColor )
+			, m_EnabledSelectColor( EnabledSelectColor ), m_EnabledSelectBkColor( EnabledSelectBkColor )
+		{
+		}
+
 		BOOL IsEnabled;
 		CString ToolTipStr;
+		COLORREF m_DisabledColor;
+		COLORREF m_DisabledBkColor;
+		COLORREF m_EnabledColor;
+		COLORREF m_EnabledBkColor;
+		COLORREF m_EnabledSelectColor;
+		COLORREF m_EnabledSelectBkColor;
 	};
+
+	BOOL IsItemEnabled( ComboBox* combobox, UINT nIndex, ComboBoxItemDetails * comboboxitemdetails = NULL )
+	{
+		if ( nIndex >= static_cast<DWORD>(combobox->GetCount()) )
+			return TRUE;
+
+		ComboBoxItemDetails* data = static_cast<ComboBoxItemDetails*>(combobox->GetItemDataPtr( nIndex ));
+		if ( data == NULL )
+			return TRUE;
+		if ( comboboxitemdetails != NULL )
+			*comboboxitemdetails = *data;
+		return data->IsEnabled;
+	}
 
 	/////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////
@@ -54,17 +87,26 @@ namespace mfcx
 	// ComboBox implementation
 	const UINT nMessage = ::RegisterWindowMessage( _T( "ComboSelEndOK" ) );
 
-	ComboBox::ComboBox( COLORREF DisabledColor, COLORREF DisabledBkColor, COLORREF AlternateDisabledColor )
-		:m_ToolTipItemRecievedStr( FALSE ), m_bLastCB_Sel( -2 ), m_DisabledColor( DisabledColor )
-		, m_DisabledBkColor( DisabledBkColor ), m_AlternateDisabledColor( AlternateDisabledColor )
+
+	ComboBox::ComboBox( COLORREF DisabledColor, COLORREF DisabledBkColor,
+						COLORREF EnabledColor, COLORREF EnabledBkColor,
+						COLORREF EnabledSelectColor, COLORREF EnabledSelectBkColor )
+		:m_ToolTipItemRecievedStr( FALSE ), m_bLastCB_Sel( -2 )
+		, m_DisabledColor( GetColor(DisabledColor, COLOR_WINDOWTEXT) ), m_DisabledBkColor( GetColor(DisabledBkColor, COLOR_WINDOW))
+		, m_EnabledColor( GetColor(EnabledColor , COLOR_WINDOWTEXT) ), m_EnabledBkColor( GetColor(EnabledBkColor , COLOR_WINDOW) )
+		, m_EnabledSelectColor( GetColor(EnabledSelectColor , COLOR_HIGHLIGHTTEXT) ), m_EnabledSelectBkColor( GetColor(EnabledSelectBkColor , COLOR_HIGHLIGHT) )
 		, m_ListBox( new ComboBoxListBox() ), m_DoToolTipPopupWhenItemStringTooWide(FALSE)
 	{
 		Initiate();
 	}
 
-	ComboBox::ComboBox( CString ToolTipString, COLORREF DisabledColor, COLORREF DisabledBkColor, COLORREF AlternateDisabledColor )
-		:m_ToolTipItemRecievedStr( FALSE ), m_bLastCB_Sel( -2 ), m_ToolTipString( ToolTipString ), m_DisabledColor( DisabledColor )
-		, m_DisabledBkColor( DisabledBkColor ), m_AlternateDisabledColor( AlternateDisabledColor )
+	ComboBox::ComboBox( const CString &ToolTipString, COLORREF DisabledColor, COLORREF DisabledBkColor,
+						COLORREF EnabledColor, COLORREF EnabledBkColor,
+						COLORREF EnabledSelectColor, COLORREF EnabledSelectBkColor )
+		:m_ToolTipItemRecievedStr( FALSE ), m_bLastCB_Sel( -2 ), m_ToolTipString( ToolTipString )
+		, m_DisabledColor( GetColor( DisabledColor, COLOR_WINDOWTEXT ) ), m_DisabledBkColor( GetColor( DisabledBkColor, COLOR_WINDOW ) )
+		, m_EnabledColor( GetColor( EnabledColor, COLOR_WINDOWTEXT ) ), m_EnabledBkColor( GetColor( EnabledBkColor, COLOR_WINDOW ) )
+		, m_EnabledSelectColor( GetColor( EnabledSelectColor, COLOR_HIGHLIGHTTEXT ) ), m_EnabledSelectBkColor( GetColor( EnabledSelectBkColor, COLOR_HIGHLIGHT ) )
 		, m_ListBox( new ComboBoxListBox() ), m_DoToolTipPopupWhenItemStringTooWide( FALSE )
 	{
 		Initiate();
@@ -109,36 +151,56 @@ namespace mfcx
 		CComboBox::PreSubclassWindow();
 	}
 
+	COLORREF ComboBox::GetDisabledItemTextColor( BOOL IsDisabled, BOOL IsItemSelected, COLORREF SupersededDisableColor, COLORREF SupersededEnableColor, COLORREF SupersededSelectedColor )
+	{
+		const COLORREF SelectedColor = (SupersededSelectedColor == DEFAULT_COLORS) ? m_EnabledSelectColor : SupersededSelectedColor;
+		if ( !IsDisabled && IsItemSelected )
+			return SelectedColor;
+		const COLORREF DisabledColor = (SupersededDisableColor == DEFAULT_COLORS) ? m_DisabledColor : SupersededDisableColor;
+		const COLORREF EnabledColor = (SupersededEnableColor == DEFAULT_COLORS) ? m_EnabledColor : SupersededEnableColor;
+		const COLORREF TextColor = IsDisabled ? DisabledColor : EnabledColor;
+		return TextColor;
+	}
+
+	COLORREF ComboBox::GetDisabledItemTextBkColor( BOOL IsDisabled, BOOL IsItemSelected, COLORREF SupersededDisableBkColor, COLORREF SupersededEnableBkColor, COLORREF SupersededBkSelectedColor )
+	{
+		const COLORREF SelectedBkColor = (SupersededBkSelectedColor == DEFAULT_COLORS) ? m_EnabledSelectBkColor : SupersededBkSelectedColor;
+		if ( !IsDisabled && IsItemSelected )
+			return SelectedBkColor;
+		const COLORREF DisabledBkColor = (SupersededDisableBkColor == DEFAULT_COLORS) ? m_DisabledBkColor : SupersededDisableBkColor;
+		const COLORREF EnabledBkColor = (SupersededEnableBkColor == DEFAULT_COLORS) ? m_EnabledBkColor : SupersededEnableBkColor;
+		const COLORREF TextBkColor = IsDisabled ? DisabledBkColor : EnabledBkColor;
+		return TextBkColor;
+	}
+
 	void ComboBox::DrawItem( LPDRAWITEMSTRUCT lpDrawItemStruct )
 	{
 		CDC* pDC = CDC::FromHandle( lpDrawItemStruct->hDC );
+		const RECT &rc = lpDrawItemStruct->rcItem;
+		BOOL IsItemSelected = (lpDrawItemStruct->itemState & ODS_SELECTED) ? TRUE : FALSE;
+		COLORREF oldTextColor = DEFAULT_COLORS;
+		COLORREF oldBkColor = DEFAULT_COLORS;
+		CFont* pOldFont = NULL;
+		CString strText;
+
 
 		if ( ((LONG)(lpDrawItemStruct->itemID) >= 0) &&
 			(lpDrawItemStruct->itemAction & (ODA_DRAWENTIRE | ODA_SELECT)) )
 		{
-			CString ToolTipItem;
-			BOOL fDisabled = !IsWindowEnabled() || !IsItemEnabled( lpDrawItemStruct->itemID, &ToolTipItem );
-			COLORREF newTextColor = fDisabled ? m_DisabledColor : GetSysColor( COLOR_WINDOWTEXT );  // light gray
-			COLORREF newBkColor = (fDisabled && m_DisabledBkColor != USE_DEFAULT_WINDOWS_BK_COLOR && m_DisabledBkColor != m_DisabledColor) ? m_DisabledBkColor : GetSysColor( COLOR_WINDOW );
+			ComboBoxItemDetails comboboxitemdetails;
+			BOOL IsItemDisabled = !IsWindowEnabled() || !IsItemEnabled(this, lpDrawItemStruct->itemID, &comboboxitemdetails );
+			CString ToolTipItem = comboboxitemdetails.ToolTipStr;
+			COLORREF newTextColor = GetDisabledItemTextColor( IsItemDisabled, IsItemSelected, comboboxitemdetails.m_DisabledColor, comboboxitemdetails.m_EnabledColor, comboboxitemdetails.m_EnabledSelectColor );
+			COLORREF newBkColor = GetDisabledItemTextBkColor( IsItemDisabled, IsItemSelected, comboboxitemdetails.m_DisabledBkColor, comboboxitemdetails.m_EnabledBkColor, comboboxitemdetails.m_EnabledSelectBkColor );
 
-			if ( newTextColor == newBkColor )
-				newTextColor = m_AlternateDisabledColor;   // dark gray
+			oldTextColor = pDC->SetTextColor( newTextColor );
+			oldBkColor = pDC->SetBkColor( newBkColor );
 
-			COLORREF oldTextColor = pDC->SetTextColor( newTextColor );
-			COLORREF oldBkColor = pDC->SetBkColor( newBkColor );
 
-			if ( !fDisabled && ((lpDrawItemStruct->itemState & ODS_SELECTED) != 0) )
-			{
-				pDC->SetTextColor( GetSysColor( COLOR_HIGHLIGHTTEXT ) );
-				pDC->SetBkColor( GetSysColor( COLOR_HIGHLIGHT ) );
-			}
-
-			CFont* pOldFont = pDC->SelectObject( &m_font );
-			CString strText;
+			pOldFont = pDC->SelectObject( &m_font );
 			GetLBText( lpDrawItemStruct->itemID, strText );
-			const RECT &rc = lpDrawItemStruct->rcItem;
 			pDC->ExtTextOut( rc.left + 2,
-							 rc.top + 2,// + max(0, (cyItem - m_cyText) / 2),
+							 rc.top + 2,
 							 ETO_OPAQUE, &rc,
 							 strText, NULL );
 			CSize TextSize = pDC->GetTextExtent( strText );
@@ -180,51 +242,39 @@ namespace mfcx
 					m_hwndItemTip.SendMessage( TTM_ADDTOOL, 0, reinterpret_cast<LPARAM>(&toolInfo) );
 				}
 			}
-
-			pDC->SelectObject( pOldFont );
-			pDC->SetTextColor( oldTextColor );
-			pDC->SetBkColor( oldBkColor );
 		} 
 		else if ( (LONG)(lpDrawItemStruct->itemID) < 0 )	// drawing edit text
 		{
-			COLORREF newTextColor = GetSysColor( COLOR_WINDOWTEXT );  // light gray
-			COLORREF oldTextColor = pDC->SetTextColor( newTextColor );
-
-			COLORREF newBkColor = GetSysColor( COLOR_WINDOW );
-			COLORREF oldBkColor = pDC->SetBkColor( newBkColor );
-
-			if ( (lpDrawItemStruct->itemState & ODS_SELECTED) != 0 )
-			{
-				pDC->SetTextColor( GetSysColor( COLOR_HIGHLIGHTTEXT ) );
-				pDC->SetBkColor( GetSysColor( COLOR_HIGHLIGHT ) );
-			}
-
-			CString strText;
+			oldTextColor = pDC->SetTextColor( GetDisabledItemTextColor( FALSE, IsItemSelected ));
+			oldBkColor = pDC->SetBkColor( GetDisabledItemTextBkColor( FALSE, IsItemSelected ) );
 			GetWindowText( strText );
-			const RECT &rc = lpDrawItemStruct->rcItem;
-
 			pDC->ExtTextOut( rc.left + 2,
-							 rc.top + 2,// + max(0, (cyItem - m_cyText) / 2),
+							 rc.top + 2,
 							 ETO_OPAQUE, &rc,
 							 strText, strText.GetLength(), NULL );
+		}
 
+		if ( oldTextColor != DEFAULT_COLORS && oldBkColor != DEFAULT_COLORS )
+		{
 			pDC->SetTextColor( oldTextColor );
 			pDC->SetBkColor( oldBkColor );
+			if ( pOldFont != NULL )
+				pDC->SelectObject( pOldFont );
 		}
+
 		if ( (lpDrawItemStruct->itemAction & ODA_FOCUS) != 0 )
 			pDC->DrawFocusRect( &lpDrawItemStruct->rcItem );
 	}
 
 	void ComboBox::MeasureItem( LPMEASUREITEMSTRUCT lpMeasureItemStruct )
 	{
-		//Add code to determine the size of specified item
 		UNREFERENCED_PARAMETER( lpMeasureItemStruct );
 	}
 
 	int ComboBox::OnCharToItem( UINT nChar, CListBox* pListBox, UINT nIndex )
 	{
 		int ret = CComboBox::OnCharToItem( nChar, pListBox, nIndex );
-		if ( ret >= 0 && !IsItemEnabled( ret ) )
+		if ( ret >= 0 && !IsItemEnabled(this, ret ) )
 			return -2;
 		else
 			return ret;
@@ -241,7 +291,7 @@ namespace mfcx
 		CString currentText;
 		GetWindowText( currentText );
 		int index = FindStringExact( -1, currentText );
-		if ( index >= 0 && !IsItemEnabled( index ) )
+		if ( index >= 0 && !IsItemEnabled(this, index ) )
 		{
 			SetWindowText( m_strSavedText );
 			GetParent()->SendMessage( WM_COMMAND, MAKELONG( GetWindowLong( m_hWnd, GWL_ID ), CBN_SELCHANGE ), (LPARAM)m_hWnd );
@@ -258,39 +308,36 @@ namespace mfcx
 
 	void ComboBox::PostNcDestroy()
 	{
-		//	m_ListBox->UnsubclassWindow();
 		m_ListBox->Detach();
 		CComboBox::PostNcDestroy();
 	}
 
-	BOOL ComboBox::IsItemEnabled( UINT nIndex, CString * ToolTipFetch ) const
-	{
-		if ( nIndex >= static_cast<DWORD>(GetCount()) )
-			return TRUE;
-
-		ComboBoxItemDetails* data = static_cast<ComboBoxItemDetails*>(GetItemDataPtr( nIndex ));
-		if ( data == NULL )
-			return TRUE;
-		if ( ToolTipFetch != NULL )
-			*ToolTipFetch = data->ToolTipStr;
-		return data->IsEnabled;
-	}
-
-	void ComboBox::SetItemDetails( UINT nIndex, BOOL IsEnabled, CString ToolTipStr )
+	void ComboBox::SetItemDetails( UINT nIndex, BOOL IsEnabled, CString ToolTipStr,
+								   COLORREF DisabledColor, COLORREF DisabledBkColor,
+								   COLORREF EnabledColor, COLORREF EnabledBkColor,
+								   COLORREF EnabledSelectColor, COLORREF EnabledSelectBkColor )
 	{
 		if ( nIndex >= static_cast<DWORD>(GetCount()) )
 			return;
 
-		ComboBoxItemDetails* data = new ComboBoxItemDetails( IsEnabled, ToolTipStr );
+		ComboBoxItemDetails* data = new ComboBoxItemDetails( IsEnabled, ToolTipStr, DisabledColor, DisabledBkColor, EnabledColor, EnabledBkColor, EnabledSelectColor, EnabledSelectBkColor );
 		m_vComboBoxItemDetails.push_back( std::shared_ptr<ComboBoxItemDetails>( data ) );
 		SetItemDataPtr( nIndex, static_cast<void*>(data) );
 	}
 
-	int ComboBox::AddString( const CString &str, BOOL IsEnabled, CString ToolTipStr )
+	int ComboBox::AddString( const CString &str, BOOL IsEnabled, const CString &ToolTipStr )
+	{
+		return AddString( str, IsEnabled, ToolTipStr, DEFAULT_COLORS );
+	}
+
+	int ComboBox::AddString( const CString &str, BOOL IsEnabled, const CString ToolTipStr,
+							 COLORREF DisabledColor, COLORREF DisabledBkColor,
+							 COLORREF EnabledColor, COLORREF EnabledBkColor,
+							 COLORREF EnabledSelectColor, COLORREF EnabledSelectBkColor )
 	{
 		int nIndex = CComboBox::AddString( str );
 		if ( nIndex != CB_ERR )
-			SetItemDetails( nIndex, IsEnabled, ToolTipStr );
+			SetItemDetails( nIndex, IsEnabled, ToolTipStr, DisabledColor, DisabledBkColor, EnabledColor, EnabledBkColor, EnabledSelectColor, EnabledSelectBkColor );
 
 		return nIndex;
 	}
@@ -346,7 +393,7 @@ namespace mfcx
 		{
 			BOOL outside = FALSE;
 			int index = ((CListBox *)this)->ItemFromPoint( point, outside );
-			if ( !outside && !m_Parent->IsItemEnabled( index ) )
+			if ( !outside && !IsItemEnabled( m_Parent, index ) )
 				return;	// don't click there
 		}
 		CWnd::OnLButtonUp( nFlags, point );
