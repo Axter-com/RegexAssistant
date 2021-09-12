@@ -15,7 +15,6 @@
 #include "mfcx.ComboBox.h"
 #include <boost/xpressive/xpressive.hpp>
 
-
 #define REPORT_ERR_AND_EXIT(exit_err_no, msg_format, ...) {CString msg; msg.Format(_T("Error:  " msg_format "  Performming early exit due to error."),__VA_ARGS__);AfxMessageBox(msg);exit(exit_err_no);}
 class CRegexAssistantDlgAutoProxy;
 struct MARKERDATAtag
@@ -36,9 +35,9 @@ struct RegexCompatibilityProperties
 	int HighLightIndexID;
 };
 
-class CRegexAssistantDlg :	public CSizingDialog 
+class CRegexAssistantDlg : public CSizingDialog
 {
-	DECLARE_DYNAMIC(CRegexAssistantDlg);
+	DECLARE_DYNAMIC( CRegexAssistantDlg );
 	friend class CRegexAssistantDlgAutoProxy;
 	enum { IdxRegex = 0, IdxDescription = 1, IdxExample = 2, IdxMatch = 3 };
 	static const int QtyColumnsInLinst;
@@ -48,8 +47,8 @@ class CRegexAssistantDlg :	public CSizingDialog
 	static const CString m_DefaultTestTargetTextData;
 	static const MARKERDATAtag m_MarkerData[];
 public:
-	CRegexAssistantDlg(CString regex_search, CString regex_replace, CString Sample, CRegexAssistantApp::SampleLoadMethod sampleloadmethod, 
-						int MonitorToDisplay, Regex_Compatibility regex_compatibility, CWnd* pParent = nullptr);
+	CRegexAssistantDlg( CString regex_search, CString regex_replace, CString Sample, CRegexAssistantApp::SampleLoadMethod sampleloadmethod,
+						int MonitorToDisplay, Regex_Compatibility regex_compatibility, CWnd* pParent = nullptr );
 	virtual ~CRegexAssistantDlg();
 	static const RegexCompatibilityProperties m_RegexCompatibilityProperties[];
 
@@ -59,9 +58,9 @@ public:
 
 protected:
 	virtual BOOL OnNotify( WPARAM wParam, LPARAM lParam, LRESULT* pResult );
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
+	virtual void DoDataExchange( CDataExchange* pDX );	// DDX/DDV support
 	virtual BOOL OnInitDialog();
-	void OnEnChangeRegexEditBox( CString MarkString, DWORD Flag = 0);
+	void OnEnChangeRegexEditBox( CString MarkString, DWORD Flag = 0 );
 	void OnEnChangeRegexEditBox_LineByLine( CString MarkString );
 	void OnEnChangeRegexEditBox_BodyMethod( CString MarkString );
 	void UpdateWindowTitle();
@@ -124,7 +123,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+	afx_msg void OnSysCommand( UINT nID, LPARAM lParam );
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg void OnClose();

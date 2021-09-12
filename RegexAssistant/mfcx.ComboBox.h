@@ -4,13 +4,15 @@
 	This program is distributed in the hope that it will be useful,	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 	Purpose:
-		Add tooltip and disable items functionality to CComboBox class.
-			1. Implimentation that adds tooltips for each item in the ComboBox list.
+		Add tooltip, disable items, and custom color functionality to CComboBox class.
+			1. Includes implimentation that adds tooltips for each item in the ComboBox list.
 			2. Implimentation for adding a tooltip to the main ComboBox window.
-			3. Can disable specific items in the ComboBox
-			4. Can select disabled text color and background color
-			5. Optionally when set, can produce a tooltip popup window only when string is too long to fit in the ComboBox.
-	
+			3. Can disable specific items in the ComboBox.
+			4. Can set disabled text color and background color.
+			5. Able to set custom colors for all items.
+			6. Able to set a different custom colors for each item on the list.
+			7. Able to set option to produce a tooltip popup window only when string is too wide to fit in the ComboBox.
+
 	Usage Details:
 		Important!!!: Set  properties settings to [Has String] = 'true' and [Owner Draw] = 'Fixed'
 		Replace the CComboBox control with mfcx::ComboBox in the header.
@@ -25,46 +27,82 @@
 
 namespace mfcx
 {
-	class ComboBoxListBox;
-	class ComboBoxItemDetails;
-	class ComboBox : public CComboBox
+	enum
+	{
+		DEFAULT_DISABLE_FG_COLOR = RGB( 0x80, 0x80, 0x80 ),
+		DEFAULT_COLORS = RGB( 0, 1, 2 )
+	};
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Helper classes for ComboBox class
+	class ColorRefSet
 	{
 	public:
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		////  ----------------------------------------------------------------------------------------------------------------
-		////  Use one of the AddString functions to set the item's enabled status and tooltip string					//////
-		/**/  virtual int AddString(const CString &str, BOOL IsEnabled = TRUE, const CString &ToolTipStr = _T( "" ) );	//////
-		////  ----------------------------------------------------------------------------------------------------------------
-		////  ----------------------------------------------------------------------------------------------------------------
-		////  Use this AddString to include item specific colors														//////
-		/**/  virtual int AddString(const CString &str, BOOL IsEnabled, const CString ToolTipStr,						//////
-		/**/  		 COLORREF DisabledColor, COLORREF DisabledBkColor = DEFAULT_COLORS,									//////
-		/**/  		 COLORREF EnabledColor = DEFAULT_COLORS, COLORREF EnabledBkColor = DEFAULT_COLORS,					//////
-		/**/  		 COLORREF EnabledSelectColor = DEFAULT_COLORS, COLORREF EnabledSelectBkColor = DEFAULT_COLORS );	//////
-		////  ----------------------------------------------------------------------------------------------------------------
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		ColorRefSet( COLORREF EnabledColor = DEFAULT_COLORS, COLORREF EnabledBkColor = DEFAULT_COLORS );
+		ColorRefSet( COLORREF DisabledColor, COLORREF DisabledBkColor, COLORREF EnabledColor, COLORREF EnabledBkColor = DEFAULT_COLORS,
+					 COLORREF EnabledSelectColor = DEFAULT_COLORS, COLORREF EnabledSelectBkColor = DEFAULT_COLORS );
+		COLORREF DisabledColor;
+		COLORREF DisabledBkColor;
+		COLORREF EnabledColor;
+		COLORREF EnabledBkColor;
+		COLORREF EnabledSelectColor;
+		COLORREF EnabledSelectBkColor;
+	};
 
+	class DisableColorRefSet : public ColorRefSet
+	{
+	public:
+		DisableColorRefSet( COLORREF DisabledColor, COLORREF DisabledBkColor,
+					 COLORREF EnabledColor = DEFAULT_COLORS, COLORREF EnabledBkColor = DEFAULT_COLORS,
+					 COLORREF EnabledSelectColor = DEFAULT_COLORS, COLORREF EnabledSelectBkColor = DEFAULT_COLORS );
+	};
+
+	class TextColorRefSet : public ColorRefSet //Change only Text colors, and use default background colors
+	{
+	public:
+		TextColorRefSet( COLORREF DisabledColor, COLORREF EnabledColor = DEFAULT_COLORS, COLORREF EnabledSelectColor = DEFAULT_COLORS );
+	};
+
+	class TextBackGroundColorRefSet : public ColorRefSet //Change only text back ground colors, and use default text colors
+	{
+	public:
+		TextBackGroundColorRefSet( COLORREF DisabledBkColor, COLORREF EnabledBkColor = DEFAULT_COLORS, COLORREF EnabledSelectBkColor = DEFAULT_COLORS );
+	};
+
+	class ComboBoxListBox;
+	class ComboBoxItemDetails;
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ComboBox class (The main class) -- See top of header file for usage details.
+	class ComboBox : public CComboBox
+	{
+		static const ColorRefSet DefaultColors;
+		static const TextColorRefSet DefaultTextColors;
+		static const TextBackGroundColorRefSet DefaultTextBkColors;
+	public:
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		////  ------------------------------------------------------------------------------------------------------------------------------------
+		////  Use the AddString function to optionally set per list item's enabled status, tooltip string, and custom color					//////
+		/**/  virtual int AddString( const CString &str, BOOL IsEnabled = TRUE, const CString &ToolTipStr = _T( "" ),						//////
+		/**/									const ColorRefSet &colorrefset = DefaultColors );											//////
+		/**/									// colorrefset can take a type from any of the derived classes (DisableColorRefSet,			//////
+		/**/									// TextColorRefSet, and TextBackGroundColorRefSet), as well as type ColorRefSet				//////
+		////  ------------------------------------------------------------------------------------------------------------------------------------
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		/////////////////////////////////////////////////////////////////////////////
 		// For custom behaviour, override the following virtual functions
 		virtual void EnableWideStrPopup( BOOL Enabled = TRUE );
 		virtual BOOL UpdateMainTooltip( const CString &value );
 
-		enum {
-			DEFAULT_DISABLE_FG_COLOR = RGB( 0x80, 0x80, 0x80 ), 
-			DEFAULT_COLORS = RGB( 0, 1, 2 )
-		};
+		ComboBox( const ColorRefSet &colorrefset = DefaultColors );
 
-		ComboBox( COLORREF DisabledColor = DEFAULT_COLORS, COLORREF DisabledBkColor = DEFAULT_COLORS,
-				  COLORREF EnabledColor = DEFAULT_COLORS, COLORREF EnabledBkColor = DEFAULT_COLORS,
-				  COLORREF EnabledSelectColor = DEFAULT_COLORS, COLORREF EnabledSelectBkColor = DEFAULT_COLORS
-				  );
-
-		ComboBox( const CString &ToolTipString, 
-				  COLORREF DisabledColor = DEFAULT_COLORS,
-				  COLORREF DisabledBkColor = DEFAULT_COLORS,
-				  COLORREF EnabledColor = DEFAULT_COLORS, COLORREF EnabledBkColor = DEFAULT_COLORS,
-				  COLORREF EnabledSelectColor = DEFAULT_COLORS, COLORREF EnabledSelectBkColor = DEFAULT_COLORS );
+		ComboBox( const CString &ToolTipString, const ColorRefSet &colorrefset = DefaultColors );
 
 		virtual ~ComboBox();
 	private:
@@ -86,25 +124,22 @@ namespace mfcx
 		CString m_strSavedText;	// saves text between OnSelendok and OnRealSelEndOK calls
 		std::unique_ptr<ComboBoxListBox> m_ListBox;
 		void Initiate();
-		virtual COLORREF GetDisabledItemTextColor( BOOL IsDisabled, BOOL IsItemSelected, COLORREF SupersededDisableColor = DEFAULT_COLORS, COLORREF SupersededEnableColor = DEFAULT_COLORS, COLORREF SupersededSelectedColor = DEFAULT_COLORS );
-		virtual COLORREF GetDisabledItemTextBkColor( BOOL IsDisabled, BOOL IsItemSelected, COLORREF SupersededDisableBkColor = DEFAULT_COLORS, COLORREF SupersededEnableBkColor = DEFAULT_COLORS, COLORREF SupersededBkSelectedColor = DEFAULT_COLORS );
-		void SetItemDetails( UINT nIndex, BOOL IsEnabled, CString ToolTipStr = _T( "" ),
-									 COLORREF DisabledColor = DEFAULT_COLORS, COLORREF DisabledBkColor = DEFAULT_COLORS,
-									 COLORREF EnabledColor = DEFAULT_COLORS, COLORREF EnabledBkColor = DEFAULT_COLORS,
-									 COLORREF EnabledSelectColor = DEFAULT_COLORS, COLORREF EnabledSelectBkColor = DEFAULT_COLORS ); // Called by AddString and sets data via SetItemDataPtr
+		virtual COLORREF GetDisabledItemTextColor( BOOL IsDisabled, BOOL IsItemSelected, const TextColorRefSet &Superseded = DefaultTextColors );
+		virtual COLORREF GetDisabledItemTextBkColor( BOOL IsDisabled, BOOL IsItemSelected, const TextBackGroundColorRefSet &Superseded = DefaultTextBkColors );
+		void SetItemDetails( UINT nIndex, BOOL IsEnabled, CString ToolTipStr = _T( "" ), const ColorRefSet &colorrefset = DefaultColors ); // Called by AddString and sets data via SetItemDataPtr
 		//{{AFX_VIRTUAL(ComboBox)
-		virtual void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
-		virtual void MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct);
+		virtual void DrawItem( LPDRAWITEMSTRUCT lpDrawItemStruct );
+		virtual void MeasureItem( LPMEASUREITEMSTRUCT lpMeasureItemStruct );
 		virtual void PreSubclassWindow();
 		virtual void PostNcDestroy();
 		//}}AFX_VIRTUAL
 
 		//{{AFX_MSG(ComboBox)
-		afx_msg int OnCharToItem(UINT nChar, CListBox* pListBox, UINT nIndex);
+		afx_msg int OnCharToItem( UINT nChar, CListBox* pListBox, UINT nIndex );
 		afx_msg void OnSelendok();
 		afx_msg LRESULT OnRealSelEndOK( WPARAM, LPARAM );
 		//}}AFX_MSG
-		LRESULT OnCtlColor(WPARAM,LPARAM lParam);
+		LRESULT OnCtlColor( WPARAM, LPARAM lParam );
 		DECLARE_MESSAGE_MAP()
 	};
 }

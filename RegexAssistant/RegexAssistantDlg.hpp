@@ -2,10 +2,10 @@
 //Initialize static members of CRegexAssistantDlg
 const MARKERDATAtag CRegexAssistantDlg::m_MarkerData[] = {
 	{RGB( 0, 0, 0 )/*Black*/, RGB( 0, 255, 0 )/*Lime*/, FALSE},       //(Green) For Boost
-	{RGB( 0, 0, 0 )/*Black*/, RGB( 255, 255, 0 )/*Yellow*/, FALSE},   // For REGEX_COMPATIBILITY_SCINTILLA_POSIX
-	{RGB( 0, 0, 0 )/*Black*/, RGB( 0, 255, 255 )/*Cyan*/, FALSE},     //For STD Regex and STD SED
-	{RGB( 0, 0, 0 /*Black*/ ), RGB( 255, 128, 0 )/*Orange*/, FALSE},  //For REGEX_COMPATIBILITY_SCINTILLA
-	{RGB( 0, 0, 0 /*Black*/ ), RGB( 254, 185, 170 )/*Pink*/, FALSE }  //For Java
+{RGB( 0, 0, 0 )/*Black*/, RGB( 255, 255, 0 )/*Yellow*/, FALSE},   // For REGEX_COMPATIBILITY_SCINTILLA_POSIX
+{RGB( 0, 0, 0 )/*Black*/, RGB( 0, 255, 255 )/*Cyan*/, FALSE},     //For STD Regex and STD SED
+{RGB( 0, 0, 0 /*Black*/ ), RGB( 255, 128, 0 )/*Orange*/, FALSE},  //For REGEX_COMPATIBILITY_SCINTILLA
+{RGB( 0, 0, 0 /*Black*/ ), RGB( 254, 185, 170 )/*Pink*/, FALSE}  //For Java
 };
 
 enum
@@ -17,32 +17,32 @@ enum
 	RGB_Pink,
 	NUM_OF_MARKERS,
 
-	REGEX_SUBSET_SCINTILLA			= 128,		//See https://www.scintilla.org/SciTERegEx.html
-	REGEX_SUBSET_BOOST				= 256,
-	REGEX_SUBSET_BOOST_ALL			= 512,
-	REGEX_SUBSET_STD_REGEX			= 2048,
-	REGEX_SUBSET_PCRE2				= 4096,
-	REGEX_SUBSET_RE2				= 8192,
-	REGEX_SUBSET_DOTNET				= 16384,
-	REGEX_SUBSET_PYTHON				= 32768,
-	REGEX_SUBSET_JAVA				= 65536,
+	REGEX_SUBSET_SCINTILLA = 128,		//See https://www.scintilla.org/SciTERegEx.html
+	REGEX_SUBSET_BOOST = 256,
+	REGEX_SUBSET_BOOST_ALL = 512,
+	REGEX_SUBSET_STD_REGEX = 2048,
+	REGEX_SUBSET_PCRE2 = 4096,
+	REGEX_SUBSET_RE2 = 8192,
+	REGEX_SUBSET_DOTNET = 16384,
+	REGEX_SUBSET_PYTHON = 32768,
+	REGEX_SUBSET_JAVA = 65536,
 
-	REGEX_SUBSET_UNIX_OLD_SYNTAX	= 131072,
-	REGEX_SUBSET_PERL				= 262144,
-	REGEX_SUBSET_MULTILINE			= 524288,
-	REGEX_SUBSET_SED				= 1048576,
-	REGEX_SUBSET_POSIX				= 2097152
+	REGEX_SUBSET_UNIX_OLD_SYNTAX = 131072,
+	REGEX_SUBSET_PERL = 262144,
+	REGEX_SUBSET_MULTILINE = 524288,
+	REGEX_SUBSET_SED = 1048576,
+	REGEX_SUBSET_POSIX = 2097152
 };
 
 #define NOT_IMPLEMENTED FALSE, "", "Awaiting Implementation", 0
 
 const RegexCompatibilityProperties CRegexAssistantDlg::m_RegexCompatibilityProperties[] =
 {
-{_T( "POSIX" ), REGEX_COMPATIBILITY_SCINTILLA_POSIX, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_POSIX), TRUE, "POSIX", "Scintilla POSIX syntax", RGB_YELLOW},
-{_T( "All" ), REGEX_COMPATIBILITY_ALL, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE),  NOT_IMPLEMENTED}, //Works with most regex syntax. In the backend, some syntax gets converted to work with Boost All
+	{_T( "POSIX" ), REGEX_COMPATIBILITY_SCINTILLA_POSIX, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_POSIX), TRUE, "POSIX", "Scintilla POSIX syntax", RGB_YELLOW},
+{_T( "All" ), REGEX_COMPATIBILITY_ALL, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE), NOT_IMPLEMENTED}, //Works with most regex syntax. In the backend, some syntax gets converted to work with Boost All
 {_T( "Boost" ), REGEX_COMPATIBILITY_BOOST, REGEX_SUBSET_BOOST, TRUE, "Boost", "Default boost regex with flag regex_constants::format_default", RGB_Cyan},
 {_T( "Boost (default) Multiline" ), REGEX_COMPATIBILITY_BOOST_DEFAULT_MULTILINE, (REGEX_SUBSET_BOOST | REGEX_SUBSET_MULTILINE), TRUE, "BoostDefaultMultiline", "Boost with multiline set", RGB_Cyan},
-{_T( "Boost - All" ), REGEX_COMPATIBILITY_BOOST_ALL_STANDARD, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL ), TRUE, "BoostAll", "Boost with flag regex_constants::format_all", RGB_Cyan},
+{_T( "Boost - All" ), REGEX_COMPATIBILITY_BOOST_ALL_STANDARD, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL), TRUE, "BoostAll", "Boost with flag regex_constants::format_all", RGB_Cyan},
 {_T( "Boost - All Multiline" ), REGEX_COMPATIBILITY_BOOST_ALL_MULTILINE, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE), TRUE, "BoostAllMulti", "Boost with ALL (format_all) and multiline selected", RGB_Cyan},
 {_T( "Boost Perl Multiline" ), REGEX_COMPATIBILITY_BOOST_PERL_MULTILINE, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL | REGEX_SUBSET_MULTILINE), TRUE, "BoostPerl", "Boost with Perl (regex_constants::format_perl) and Multiline set", RGB_Cyan},
 {_T( "C++ Regex" ), REGEX_COMPATIBILITY_CPP, REGEX_SUBSET_STD_REGEX, TRUE, "C++", "C++ STD Regex", RGB_Orange},
@@ -67,11 +67,11 @@ const RegexCompatibilityProperties CRegexAssistantDlg::m_RegexCompatibilityPrope
 {_T( "SED C++" ), REGEX_COMPATIBILITY_CPP_REGEX_SED, (REGEX_SUBSET_STD_REGEX | REGEX_SUBSET_SED), TRUE, "SED", "SED via C++ STD Regex SED (regex_constants::format_sed)", RGB_Orange},
 {_T( "TCL" ), REGEX_COMPATIBILITY_TCL, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL), TRUE, "TCL", "TCL via Boost Perl (regex_constants::format_perl)", RGB_Cyan},
 {_T( "VBSCRIPT" ), REGEX_COMPATIBILITY_VBSCRIPT, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL), TRUE, "VBSCRIPT", "Using Boost Perl to emulate VBSCRIPT Regex. (regex_constants::format_perl)", RGB_Cyan},//Same as javascript
-{ _T( "VIM" ), REGEX_COMPATIBILITY_VIM, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE), NOT_IMPLEMENTED},//Do conversions with boost all   "Old UNIX Style (Default Scintilla)"
+{_T( "VIM" ), REGEX_COMPATIBILITY_VIM, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE), NOT_IMPLEMENTED},//Do conversions with boost all   "Old UNIX Style (Default Scintilla)"
 #ifdef _DEBUG //The following are for test purposes only.
 {_T( "Testing 1 A Wide String in ComboBox1" ), REGEX_COMPATIBILITY_DUMMY1, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE), TRUE, "FooFoo1", "", RGB_Lime},
-{_T( "Testing 2 A Wide String in ComboBox2" ), REGEX_COMPATIBILITY_DUMMY2, (REGEX_SUBSET_BOOST |  REGEX_SUBSET_MULTILINE), TRUE, "FooFoo2", "More Foo Foo2", RGB_YELLOW},
-{_T( "Testing 3 A Wide String in ComboBox3" ), REGEX_COMPATIBILITY_DUMMY3, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL ), TRUE, "FooFoo3", "", RGB_Cyan},
+{_T( "Testing 2 A Wide String in ComboBox2" ), REGEX_COMPATIBILITY_DUMMY2, (REGEX_SUBSET_BOOST | REGEX_SUBSET_MULTILINE), TRUE, "FooFoo2", "More Foo Foo2", RGB_YELLOW},
+{_T( "Testing 3 A Wide String in ComboBox3" ), REGEX_COMPATIBILITY_DUMMY3, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL), TRUE, "FooFoo3", "", RGB_Cyan},
 {_T( "Testing 4 A Wide String in ComboBox4" ), REGEX_COMPATIBILITY_DUMMY4, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE), TRUE, "FooFoo4", "More Foo Foo4", RGB_Orange},
 {_T( "Testing 5 A Wide String in ComboBox5" ), REGEX_COMPATIBILITY_DUMMY5, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_POSIX), TRUE, "FooFoo5", "More Foo Foo5", RGB_Pink}
 #endif
@@ -156,48 +156,48 @@ const CString CRegexAssistantDlg::InsertItemsList[] =
 	INSERT_ITEMS_LIST( "$3rd Argument for replacement token", "$3", "", "" ),
 	INSERT_ITEMS_LIST( "$Alternate syntax for replacement token", "$1($2)", "", "" ),
 	INSERT_ITEMS_LIST( "", "", "", "" )
-/*  Note: Scintilla standard uses following systax \(foo\)\(\S*\) and replacement boo\2 vs Scintilla POSIX uses syntax (foo)(\S*)
-	Test out the following VIM tokens, and if they down't work, see if they can get converted to Perl syntax
-		\_s 				[ \t\r\n\v\f] or \s
-		\u					[A-Z]
-		\l					[a-z]
-		\x					[A-Fa-f0-9]
-		\p					[\x20-\x7E]
-		\a					[A-Za-z]
-	
-	Check if the following java tokens can be converted to Perl syntax
-		\p{ASCII}			[\x00-\x7F]
-		\p{Alnum} 			[A-Za-z0-9]
-		\p{Alpha}			[A-Za-z]
-		\p{Blank} 			[ \t]
-		\p{Cntrl} 			[\x00-\x1F\x7F]
-		\p{Graph} 			[\x21-\x7E]
-		\p{Lower} 			[a-z]
-		\p{Print} 			[\x20-\x7E]
-		\p{Punct} 			[][!"#$%&'()*+,./:;<=>?@\^_`{|}~-]
-		\p{Upper} 			[A-Z]
-		\p{XDigit} 			[A-Fa-f0-9]
-		\p{Digit} or \d 	[0-9]
-		\p{Space} or \s 	[ \t\r\n\v\f]
-	
-	Check if the following POSIX tokens work or can be converted to Perl syntax
-		[:alnum:]			[A-Za-z0-9] 	Alphanumeric characters
-		[:alpha:]			[A-Za-z] 	Alphabetic characters
-		[:blank:]			[ \t] 	Space and tab
-		[:cntrl:]			[\x00-\x1F\x7F] 	Control characters
-		[:digit:]			[0-9] 	Digits
-		[:graph:]			[\x21-\x7E] 	Visible characters
-		[:lower:]			[a-z] 	Lowercase letters
-		[:print:]			[\x20-\x7E] 	Visible characters and the space character
-		[:punct:]			[][!"#$%&'()*+,./:;<=>?@\^_`{|}~-] 	Punctuation characters
-		[:space:]			[ \t\r\n\v\f] 	Whitespace characters
-		[:upper:]			[A-Z] 	Uppercase letters
-		[:xdigit:]			[A-Fa-f0-9] 	Hexadecimal digits
-		
-	*Non-standard
-		[:ascii:]			[\x00-\x7F] 	ASCII characters
-		[:word:]			[A-Za-z0-9_] 	Alphanumeric characters plus "_"
-*/
+	/*  Note: Scintilla standard uses following systax \(foo\)\(\S*\) and replacement boo\2 vs Scintilla POSIX uses syntax (foo)(\S*)
+		Test out the following VIM tokens, and if they down't work, see if they can get converted to Perl syntax
+			\_s 				[ \t\r\n\v\f] or \s
+			\u					[A-Z]
+			\l					[a-z]
+			\x					[A-Fa-f0-9]
+			\p					[\x20-\x7E]
+			\a					[A-Za-z]
+
+		Check if the following java tokens can be converted to Perl syntax
+			\p{ASCII}			[\x00-\x7F]
+			\p{Alnum} 			[A-Za-z0-9]
+			\p{Alpha}			[A-Za-z]
+			\p{Blank} 			[ \t]
+			\p{Cntrl} 			[\x00-\x1F\x7F]
+			\p{Graph} 			[\x21-\x7E]
+			\p{Lower} 			[a-z]
+			\p{Print} 			[\x20-\x7E]
+			\p{Punct} 			[][!"#$%&'()*+,./:;<=>?@\^_`{|}~-]
+			\p{Upper} 			[A-Z]
+			\p{XDigit} 			[A-Fa-f0-9]
+			\p{Digit} or \d 	[0-9]
+			\p{Space} or \s 	[ \t\r\n\v\f]
+
+		Check if the following POSIX tokens work or can be converted to Perl syntax
+			[:alnum:]			[A-Za-z0-9] 	Alphanumeric characters
+			[:alpha:]			[A-Za-z] 	Alphabetic characters
+			[:blank:]			[ \t] 	Space and tab
+			[:cntrl:]			[\x00-\x1F\x7F] 	Control characters
+			[:digit:]			[0-9] 	Digits
+			[:graph:]			[\x21-\x7E] 	Visible characters
+			[:lower:]			[a-z] 	Lowercase letters
+			[:print:]			[\x20-\x7E] 	Visible characters and the space character
+			[:punct:]			[][!"#$%&'()*+,./:;<=>?@\^_`{|}~-] 	Punctuation characters
+			[:space:]			[ \t\r\n\v\f] 	Whitespace characters
+			[:upper:]			[A-Z] 	Uppercase letters
+			[:xdigit:]			[A-Fa-f0-9] 	Hexadecimal digits
+
+		*Non-standard
+			[:ascii:]			[\x00-\x7F] 	ASCII characters
+			[:word:]			[A-Za-z0-9_] 	Alphanumeric characters plus "_"
+	*/
 };
 const int CRegexAssistantDlg::QtyColumnsInLinst = 4;
 const int CRegexAssistantDlg::MaxInsertItemsList = ((sizeof( InsertItemsList ) / sizeof( InsertItemsList[0] ))) / QtyColumnsInLinst;
@@ -228,4 +228,3 @@ http://axter.com     732-987-6543\r\n\
 10.0.0.123           134-42-0156\r\n\
 459-78-2390          10.0.0.101 \r\n\
 " );
-
