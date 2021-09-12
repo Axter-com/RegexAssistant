@@ -78,8 +78,7 @@ Source base code for the RegexAssistant program is kept in the sub-folder RegexA
 RegexAssistant requires two libraries (Boost and Scintilla).  These to libraries are not yet included in the project.
 
 # Roadmap
-1.	Add Replace support to Scintilla compatibility by using std::regex for replace.
-2.	Add logic to allow window to shrink down further
+1.	Add logic to allow window to shrink down further
 3.	Add logic to remember last window size and position (to include monitor)
 4.	Add split line to allow user to change size ratio of the token window against the sample window.
 5.	Add button that will replace the target text with clipboard content
