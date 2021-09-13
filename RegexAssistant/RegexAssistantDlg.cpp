@@ -7,6 +7,7 @@
 #include "pch.h"
 //#define PY_SSIZE_T_CLEAN
 //#include <Python.h>
+#include <afxlayout.h>
 #include "framework.h"
 #include "RegexAssistant.h"
 #include "RegexAssistantDlg.h"
@@ -38,7 +39,7 @@ using namespace std;
 
 CRegexAssistantDlg::CRegexAssistantDlg( CString regex_search, CString regex_replace, CString Sample, CRegexAssistantApp::SampleLoadMethod sampleloadmethod,
 										int MonitorToDisplay, Regex_Compatibility regex_compatibility, CWnd* pParent /*=nullptr*/ )
-	: CSizingDialog( IDD_REGEXASSISTANT_DIALOG, pParent )
+	: CDialog( IDD_REGEXASSISTANT_DIALOG, pParent )
 	, m_dwLastErr( 0 ), m_bCase( FALSE ), m_bMakingChangeByReplacementLogic( false ), m_pAutoProxy( NULL )
 	, m_CurrentRegexStatement( regex_search ), m_MaxViewWidth( 4000 ), m_MonitorToDisplay( MonitorToDisplay ), m_SampleLoadMethod( sampleloadmethod )
 	, m_SampleText( m_DefaultTestTargetTextData ), m_Regex_Compalibility( regex_compatibility )
@@ -91,7 +92,7 @@ CRegexAssistantDlg::CRegexAssistantDlg( CString regex_search, CString regex_repl
 
 BOOL CRegexAssistantDlg::OnInitDialog()
 {
-	CSizingDialog::OnInitDialog();
+	CDialog::OnInitDialog();
 	ASSERT( (IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX );
 	ASSERT( IDM_ABOUTBOX < 0xF000 );
 	CMenu* pSysMenu = GetSystemMenu( FALSE );
@@ -116,7 +117,6 @@ BOOL CRegexAssistantDlg::OnInitDialog()
 		multimonitors.MoveWindowToMonitor( this->m_hWnd, static_cast<UINT>(m_MonitorToDisplay) );
 	}
 
-	SetOrgSizeAsMinSize();
 	m_RegexStatement_editBx.SetWindowText( m_CurrentRegexStatement );
 	m_TokenList_list.InsertColumn( IdxRegex, _T( "Regex" ), LVCFMT_LEFT, 100 );
 	m_TokenList_list.InsertColumn( IdxDescription, _T( "Description" ), LVCFMT_LEFT, 300 );
@@ -168,26 +168,16 @@ BOOL CRegexAssistantDlg::OnInitDialog()
 		}
 		string strText = FXString::ToString( (LPCTSTR)m_SampleText );
 		m_ScintillaWrapper.SendEditor( SCI_APPENDTEXT, strText.length(), reinterpret_cast<sptr_t>(strText.c_str()) );
+		GetDynamicLayout()->AddItem( m_ScintillaWrapper.GetWnd(),
+									 CMFCDynamicLayout::MoveNone(),
+									 CMFCDynamicLayout::SizeHorizontalAndVertical( 100, 100 ) );
 	} else
 		REPORT_ERR_AND_EXIT( -5, "Failed to initiate Scintilla." );
 
 	m_RegexCompatibility_cmbx.EnableWindow( TRUE );
+	m_UndoExpressionChange_btn.EnableWindow( FALSE );
 	OnEnChangeRegexEditBox();
-	AddControl( IDC_REGEX_EDIT_BOX, _T( "RX" ) );
-	//AddControl( IDC_IGNORE_CASE_CHECK, _T( "RX" ) );
-	//AddControl( IDC_CONVERT_SQL_WILD_TO_REGEX_BUTTON, _T( "RX" ) );
-	//AddControl( IDC_CONVERT_FILESYSTEM_WILD_TO_REGEX_BUTTON, _T( "RX" ) );
-	//AddControl( IDC_REGEX_COMPATIBILITY_SELECTION_COMBO, _T( "RX" ) );
-	AddControl( IDC_STATIC_GROUPBOX_TOKEN );
-	AddControl( IDC_TOKEN_LIST_CTRL );
-	AddControl( IDC_REPLACEWITH_STATIC );
-	AddControl( IDC_REGEX_REPLACEWITH_BOX );
-	//AddControl( IDC_REPLACE_BUTTON );
-	//AddControl( IDC_REPLACE_UNDO_BUTTON );
-	AddControl( IDC_STATIC_GROUPBOX_TEST_TARGET_TEXT );
-	AddControl( m_ScintillaWrapper.GetWnd() );
-	//AddControl( IDC_RESET_SAMPLE );
-
+	CreateSizeGrip();
 	ShowWindow( SW_SHOWNORMAL );
 
 	return TRUE;
@@ -199,9 +189,26 @@ CRegexAssistantDlg::~CRegexAssistantDlg()
 		m_pAutoProxy->m_pDialog = nullptr;
 }
 
+void CRegexAssistantDlg::CreateSizeGrip()
+{
+	if ( m_hSizeGrip != NULL )
+		return;
+	RECT rcClient;
+	::GetClientRect( GetSafeHwnd(), &rcClient );
+	int cxGrip = ::GetSystemMetrics( SM_CXVSCROLL );
+	int cyGrip = ::GetSystemMetrics( SM_CYHSCROLL );
+	m_hSizeGrip = ::CreateWindow( _T( "ScrollBar" ), _T( "" ),
+								  WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | SBS_SIZEGRIP,
+								  rcClient.right - cxGrip, rcClient.bottom - cyGrip, cxGrip, cyGrip,
+								  GetSafeHwnd(), NULL, NULL, 0 );
+	GetDynamicLayout()->AddItem( m_hSizeGrip,
+							CMFCDynamicLayout::MoveHorizontalAndVertical( 100, 100 ),
+							CMFCDynamicLayout::SizeNone() );
+}
+
 void CRegexAssistantDlg::DoDataExchange( CDataExchange* pDX )
 {
-	CSizingDialog::DoDataExchange( pDX );
+	CDialog::DoDataExchange( pDX );
 	DDX_Control( pDX, IDC_REGEX_EDIT_BOX, m_RegexStatement_editBx );
 	DDX_Control( pDX, IDC_TOKEN_LIST_CTRL, m_TokenList_list );
 	DDX_Control( pDX, IDC_IGNORE_CASE_CHECK, m_Case_btn );
@@ -218,7 +225,7 @@ void CRegexAssistantDlg::DoDataExchange( CDataExchange* pDX )
 	DDX_Control( pDX, IDC_STATIC_GROUPBOX_TEST_TARGET_TEXT, m_SampleText_Label_static );
 }
 
-BEGIN_MESSAGE_MAP( CRegexAssistantDlg, CSizingDialog )
+BEGIN_MESSAGE_MAP( CRegexAssistantDlg, CDialog )
 	ON_WM_SYSCOMMAND()
 	ON_WM_CLOSE()
 	ON_WM_PAINT()
@@ -244,7 +251,7 @@ void CRegexAssistantDlg::OnSysCommand( UINT nID, LPARAM lParam )
 		CAboutDlg dlgAbout;
 		dlgAbout.DoModal();
 	} else
-		CSizingDialog::OnSysCommand( nID, lParam );
+		CDialog::OnSysCommand( nID, lParam );
 }
 
 void CRegexAssistantDlg::OnPaint()
@@ -261,7 +268,7 @@ void CRegexAssistantDlg::OnPaint()
 		int y = (rect.Height() - cyIcon + 1) / 2;
 		dc.DrawIcon( x, y, m_hIcon );
 	} else
-		CSizingDialog::OnPaint();
+		CDialog::OnPaint();
 }
 
 HCURSOR CRegexAssistantDlg::OnQueryDragIcon()
@@ -283,7 +290,7 @@ BOOL CRegexAssistantDlg::CanExit()
 void CRegexAssistantDlg::OnClose()
 {
 	if ( CanExit() )
-		CSizingDialog::OnOK();
+		CDialog::OnOK();
 }
 
 void CRegexAssistantDlg::OnBnClickedOk()
@@ -301,7 +308,7 @@ void CRegexAssistantDlg::OnBnClickedOk()
 			m_SampleText = FXString::ToTString( pcBuffer.get() );
 		}
 	}
-	CSizingDialog::OnOK();
+	CDialog::OnOK();
 }
 
 void CRegexAssistantDlg::OnNMDblclkTokenListCtrl( NMHDR * /*pNMHDR*/, LRESULT *pResult )

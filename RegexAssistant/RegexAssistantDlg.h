@@ -8,7 +8,6 @@
 #include <vector>
 #include <map>
 #include <string>
-#include "SizingDialog.h"
 #include "ScintillaWrapper.h"
 #include "mfcx.ComboBox.h"
 #include <boost/xpressive/xpressive.hpp>
@@ -33,7 +32,7 @@ struct RegexCompatibilityProperties
 	int HighLightIndexID;
 };
 
-class CRegexAssistantDlg : public CSizingDialog
+class CRegexAssistantDlg : public CDialog
 {
 	DECLARE_DYNAMIC( CRegexAssistantDlg );
 	friend class CRegexAssistantDlgAutoProxy;
@@ -65,6 +64,7 @@ protected:
 	void RegexReplace_LineByLine( CString MarkString, CString NeedleReplacementCstr );
 	void FetchTextForUndoArray();
 	void PopulateTokenList();
+	void CreateSizeGrip();
 	BOOL CanExit();
 	int GetMarkerID();
 	bool IsStd_Regex();
@@ -106,6 +106,7 @@ protected:
 	ScintillaWrapper m_ScintillaWrapper;
 	CRegexAssistantDlgAutoProxy* m_pAutoProxy;
 	CRegexAssistantApp::SampleLoadMethod m_SampleLoadMethod;
+	HWND			m_hSizeGrip;			// handle of the size grip
 	HICON m_hIcon;
 	// Controls
 	CEdit m_RegexStatement_editBx;

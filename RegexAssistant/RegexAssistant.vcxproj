@@ -359,8 +359,6 @@ copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ScintillaWrapper.h" />
     <ClInclude Include="Screen.h" />
-    <ClInclude Include="SizingDialog.h" />
-    <ClInclude Include="SizingSP.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
@@ -379,8 +377,6 @@ copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
     <ClCompile Include="RegexAssistantDlg.cpp" />
     <ClCompile Include="ScintillaWrapper.cpp" />
     <ClCompile Include="Screen.cpp" />
-    <ClCompile Include="SizingDialog.cpp" />
-    <ClCompile Include="SizingSP.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="RegexAssistant.idl" />
