@@ -3,8 +3,6 @@
 	The RegexAssistant source code is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License.
 	This program is distributed in the hope that it will be useful,	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 */
-
-// RegexAssistantDlg.h : header file
 #pragma once
 #include "RegexAssistant.h"
 #include <vector>
@@ -40,26 +38,23 @@ class CRegexAssistantDlg : public CSizingDialog
 	DECLARE_DYNAMIC( CRegexAssistantDlg );
 	friend class CRegexAssistantDlgAutoProxy;
 	enum { IdxRegex = 0, IdxDescription = 1, IdxExample = 2, IdxMatch = 3 };
+	// Private static member variables
 	static const int QtyColumnsInLinst;
 	static const int MaxInsertItemsList;
 	static const CString InsertItemsList[];
 	static const CString m_CompatibilityComboBoxSelections[];
 	static const CString m_DefaultTestTargetTextData;
 	static const MARKERDATAtag m_MarkerData[];
+	static const RegexCompatibilityProperties m_RegexCompatibilityProperties[];
 public:
 	CRegexAssistantDlg( CString regex_search, CString regex_replace, CString Sample, CRegexAssistantApp::SampleLoadMethod sampleloadmethod,
 						int MonitorToDisplay, Regex_Compatibility regex_compatibility, CWnd* pParent = nullptr );
 	virtual ~CRegexAssistantDlg();
-	static const RegexCompatibilityProperties m_RegexCompatibilityProperties[];
-
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_REGEXASSISTANT_DIALOG };
 #endif
-
 protected:
-	virtual BOOL OnNotify( WPARAM wParam, LPARAM lParam, LRESULT* pResult );
-	virtual void DoDataExchange( CDataExchange* pDX );	// DDX/DDV support
-	virtual BOOL OnInitDialog();
+	// Functions for internal usage
 	void OnEnChangeRegexEditBox( CString MarkString, DWORD Flag = 0 );
 	void OnEnChangeRegexEditBox_LineByLine( CString MarkString );
 	void OnEnChangeRegexEditBox_BodyMethod( CString MarkString );
@@ -91,38 +86,43 @@ protected:
 	bool IsMultiline();
 	bool IsUNIX_OLD_SYNTAX();
 	boost::xpressive::regex_constants::match_flag_type GetBoostCompatibilityFlag( Regex_Compatibility regex_compatibility );
+	virtual BOOL OnNotify( WPARAM wParam, LPARAM lParam, LRESULT* pResult );
+	virtual void DoDataExchange( CDataExchange* pDX );	// DDX/DDV support
+	virtual BOOL OnInitDialog();
+
+	// Member non-static Variables
 	wchar_t *m_py_decodelocale;
 	std::string m_OriginalSampleValue;
 	std::vector<CString> m_RegexList;
 	std::vector<std::string> m_UndoSource;
-	//std::map<Regex_Compatibility, RegexCompatibilityProperties> m_CompatibilityProperties;
-	CString m_CurrentText;
-	CString m_TestTargetTextData;
+	CString m_CurrentRegexStatement;
+	CString m_SampleText;
 	int m_MaxViewWidth;
 	int m_MonitorToDisplay;
 	BOOL m_bCase;
 	bool m_bMakingChangeByReplacementLogic;
-	DWORD lastErr;
+	DWORD m_dwLastErr;
 	Regex_Compatibility m_Regex_Compalibility;
 	ScintillaWrapper m_ScintillaWrapper;
 	CRegexAssistantDlgAutoProxy* m_pAutoProxy;
 	CRegexAssistantApp::SampleLoadMethod m_SampleLoadMethod;
 	HICON m_hIcon;
-	CEdit m_RegexEditBox;
-	CListCtrl m_TokenListCtrl;
+	// Controls
+	CEdit m_RegexStatement_editBx;
+	CListCtrl m_TokenList_list;
 	mfcx::ComboBox m_RegexCompatibility_cmbx;
-	CEdit m_ReplaceWithBox;
-	CStatic m_ReplaceWithStaticText;
-	CStatic m_GroupBoxToken;
-	CButton m_Case;
-	CButton m_ReplaceButton;
-	CButton m_ReplaceUndoButton;
+	CEdit m_RegexReplacementExpression_editBx;
+	CStatic m_RegexReplacementExpression_Label_static;
+	CStatic m_TokenList_Label_static;
+	CButton m_Case_btn;
+	CButton m_RunRegexReplacement_btn;
+	CButton m_UndoRegexReplacementChanges_btn;
 	CButton m_ConvertSqlWildToRegex_btn;
 	CButton m_ConvertFilesysWildToRegex_btn;
-	CButton m_ResetButton;
-
-	DECLARE_MESSAGE_MAP()
+	CButton m_ResetSampleContent_btn;
+	CButton m_UndoExpressionChange_btn;
 public:
+	DECLARE_MESSAGE_MAP()
 	afx_msg void OnSysCommand( UINT nID, LPARAM lParam );
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
@@ -137,7 +137,9 @@ public:
 	afx_msg void OnBnClickedReplaceButton();
 	afx_msg void OnBnClickedReplaceUndoButton();
 	afx_msg void OnBnClickedStaticGroupboxTestTargetText();
+	afx_msg void OnBnClickedResetSample();
+	afx_msg void OnBnClickedUndoExpressionChange();
 	inline virtual void OnOK() { OnClose(); };
 	inline virtual void OnCancel() { OnClose(); };
-	afx_msg void OnBnClickedResetSample();
+	CStatic m_SampleText_Label_static;
 };
