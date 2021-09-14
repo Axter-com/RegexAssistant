@@ -20,6 +20,7 @@
 
 #include "ClipboardXX.hpp"
 #include "CAboutDlg.h"
+#include <boost/regex.hpp>
 #include <boost/xpressive/xpressive.hpp>
 #include <regex>
 #define GetNeedle(s)   boost::xpressive::sregex::compile(const_cast<char *>((LPCSTR)(s)))
@@ -41,7 +42,7 @@ CRegexAssistantDlg::CRegexAssistantDlg( CString regex_search, CString regex_repl
 										int MonitorToDisplay, Regex_Compatibility regex_compatibility, CWnd* pParent /*=nullptr*/ )
 	: CDialog( IDD_REGEXASSISTANT_DIALOG, pParent )
 	, m_dwLastErr( 0 ), m_bCase( FALSE ), m_bMakingChangeByReplacementLogic( false ), m_pAutoProxy( NULL )
-	, m_CurrentRegexStatement( regex_search ), m_MaxViewWidth( 4000 ), m_MonitorToDisplay( MonitorToDisplay ), m_SampleLoadMethod( sampleloadmethod )
+	, m_OriginalRegexStatement( regex_search ), m_MaxViewWidth( 4000 ), m_MonitorToDisplay( MonitorToDisplay ), m_SampleLoadMethod( sampleloadmethod )
 	, m_SampleText( m_DefaultTestTargetTextData ), m_Regex_Compalibility( regex_compatibility )
 	, m_py_decodelocale( NULL ), m_RegexCompatibility_cmbx( _T( "Items in grey, are awaiting implementation." ), mfcx::DisableColorRefSet(RGB( 105, 105, 105 ), RGB( 169, 169, 169 ) ) )
 {
@@ -117,7 +118,8 @@ BOOL CRegexAssistantDlg::OnInitDialog()
 		multimonitors.MoveWindowToMonitor( this->m_hWnd, static_cast<UINT>(m_MonitorToDisplay) );
 	}
 
-	m_RegexStatement_editBx.SetWindowText( m_CurrentRegexStatement );
+	m_LastRegexStatement = m_OriginalRegexStatement;
+	m_RegexStatement_editBx.SetWindowText( m_OriginalRegexStatement );
 	m_TokenList_list.InsertColumn( IdxRegex, _T( "Regex" ), LVCFMT_LEFT, 100 );
 	m_TokenList_list.InsertColumn( IdxDescription, _T( "Description" ), LVCFMT_LEFT, 300 );
 	m_TokenList_list.InsertColumn( IdxExample, _T( "Example" ), LVCFMT_LEFT, 110 );
@@ -230,7 +232,7 @@ BEGIN_MESSAGE_MAP( CRegexAssistantDlg, CDialog )
 	ON_WM_CLOSE()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED( IDOK, &CRegexAssistantDlg::OnBnClickedOk )
+	ON_BN_CLICKED( IDOK, &CRegexAssistantDlg::OnOK )
 	ON_NOTIFY( NM_DBLCLK, IDC_TOKEN_LIST_CTRL, &CRegexAssistantDlg::OnNMDblclkTokenListCtrl )
 	ON_BN_CLICKED( IDC_IGNORE_CASE_CHECK, &CRegexAssistantDlg::OnBnClickedIgnoreCaseCheck )
 	ON_BN_CLICKED( IDC_CONVERT_SQL_WILD_TO_REGEX_BUTTON, &CRegexAssistantDlg::OnBnClickedConvertSqlWildToRegexButton )
@@ -289,13 +291,8 @@ BOOL CRegexAssistantDlg::CanExit()
 
 void CRegexAssistantDlg::OnClose()
 {
-	if ( CanExit() )
-		CDialog::OnOK();
-}
-
-void CRegexAssistantDlg::OnBnClickedOk()
-{
-	m_RegexStatement_editBx.GetWindowText( m_CurrentRegexStatement );
+	if ( !CanExit() )
+		return;
 	if ( m_ScintillaWrapper.IsInit() )
 	{
 		int BufferSize = m_ScintillaWrapper.SendEditor( SCI_GETTEXTLENGTH ) + 1;
@@ -318,7 +315,7 @@ void CRegexAssistantDlg::OnNMDblclkTokenListCtrl( NMHDR * /*pNMHDR*/, LRESULT *p
 	{
 		int nStartChar = 0, nEndChar = 0;
 		CEdit *EditBoxToChange = &m_RegexStatement_editBx;
-		CString InsertStr = m_RegexList[CurSel];
+		CString InsertStr = m_TokenListRegexItems[CurSel];
 		if ( InsertStr.GetLength() > 1 && isdigit( InsertStr[1] ) && InsertStr[1] != '0' )
 		{
 			EditBoxToChange = &m_RegexReplacementExpression_editBx;
@@ -344,8 +341,7 @@ void CRegexAssistantDlg::OnNMDblclkTokenListCtrl( NMHDR * /*pNMHDR*/, LRESULT *p
 
 void CRegexAssistantDlg::OnBnClickedIgnoreCaseCheck()
 {
-	CString CurrentText;
-	m_RegexStatement_editBx.GetWindowText( CurrentText );
+	CString CurrentText = CopyRegexStatementForUndo();
 	if ( m_Case_btn.GetCheck() == BST_CHECKED )
 	{
 		if ( IsScintillaRegex() )
@@ -409,7 +405,7 @@ int CRegexAssistantDlg::GetMarkerID()
 	return m_RegexCompatibilityProperties[m_Regex_Compalibility].HighLightIndexID + 1;
 }
 
-void CRegexAssistantDlg::OnEnChangeRegexEditBox( CString sMarkString, DWORD Flag )
+void CRegexAssistantDlg::ChangeRegexEditBox( CString RegexStatement, DWORD Flag )
 {
 	long Start = 0, Stop = INT_MAX;
 	int Marker = GetMarkerID();
@@ -417,16 +413,16 @@ void CRegexAssistantDlg::OnEnChangeRegexEditBox( CString sMarkString, DWORD Flag
 	int iLineIndex = 0;
 	m_ScintillaWrapper.SendEditor( SCI_CLEARDOCUMENTSTYLE );
 
-	if ( sMarkString.IsEmpty() || sMarkString == _T( "^" ) || sMarkString == _T( "$" ) )
+	if ( RegexStatement.IsEmpty() || RegexStatement == _T( "^" ) || RegexStatement == _T( "$" ) )
 		return;
 
-	string strMarkText = FXString::ToString( (LPCTSTR)sMarkString );
+	string strMarkText = FXString::ToString( (LPCTSTR)RegexStatement );
 	ft.lpstrText = const_cast<char*>(strMarkText.c_str());
 	ft.chrg.cpMin = Start;
 	ft.chrg.cpMax = Stop;
 	bool FoundTextToMark = false;
 	int count = 0;
-	const int MaxCount = (sMarkString.GetLength() > 2) ? 32000 : 32;
+	const int MaxCount = (RegexStatement.GetLength() > 2) ? 32000 : 32;
 	while ( m_ScintillaWrapper.SendEditor( SCI_FINDTEXT, Flag, reinterpret_cast<sptr_t>(&ft) ) != -1 )
 	{
 		if ( ++count > MaxCount )
@@ -467,15 +463,15 @@ boost::xpressive::regex_constants::match_flag_type CRegexAssistantDlg::GetBoostC
 	return boost::xpressive::regex_constants::format_all; //REGEX_SUBSET_BOOST_ALL
 }
 
-void CRegexAssistantDlg::OnEnChangeRegexEditBox_LineByLine( CString sMarkString )
+void CRegexAssistantDlg::ChangeRegexEditBox_LineByLine( CString RegexStatement )
 {
 	try
 	{
-		if ( sMarkString == "\\b" )
+		if ( RegexStatement == "\\b" )
 			return;
 		std::unique_ptr<char[]> pcTempBuffer( new char[m_MaxViewWidth + 10] );
-		boost::xpressive::sregex boost_Needle = GetNeedle( FXString::ToString( (LPCTSTR)sMarkString ).c_str() );
-		std::regex std_Needle( FXString::ToString( (LPCTSTR)sMarkString ) );
+		boost::xpressive::sregex boost_Needle = GetNeedle( FXString::ToString( (LPCTSTR)RegexStatement ).c_str() );
+		std::regex std_Needle( FXString::ToString( (LPCTSTR)RegexStatement ) );
 		const regex_constants::match_flag_type regex_compatibility_flag = IsSED() ? std::regex_constants::format_sed : std::regex_constants::match_default;
 		const boost::xpressive::regex_constants::match_flag_type boost_compatibility_flag = GetBoostCompatibilityFlag( m_Regex_Compalibility );
 
@@ -536,7 +532,7 @@ void CRegexAssistantDlg::OnEnChangeRegexEditBox_LineByLine( CString sMarkString 
 	}
 }
 
-void CRegexAssistantDlg::OnEnChangeRegexEditBox_BodyMethod( CString sMarkString )
+void CRegexAssistantDlg::ChangeRegexEditBox_BodyMethod( CString RegexStatement )
 {
 	const boost::xpressive::regex_constants::match_flag_type boost_compatibility_flag = GetBoostCompatibilityFlag( m_Regex_Compalibility );
 	int BufferSize = m_ScintillaWrapper.SendEditor( SCI_GETTEXTLENGTH ) + 1;
@@ -551,9 +547,9 @@ void CRegexAssistantDlg::OnEnChangeRegexEditBox_BodyMethod( CString sMarkString 
 			string::const_iterator start = strHaystack.begin(), end = strHaystack.end(), itHaystackStart = strHaystack.begin();
 			boost::xpressive::regex_constants::match_flag_type flags = boost_compatibility_flag;
 			int count = 0;
-			const int MaxCount = (sMarkString.GetLength() > 2) ? 32000 : 32;
+			const int MaxCount = (RegexStatement.GetLength() > 2) ? 32000 : 32;
 			boost::xpressive::smatch what;
-			while ( boost::xpressive::regex_search( start, end, what, GetNeedle( FXString::ToString( (LPCTSTR)sMarkString ).c_str() ), flags ) )
+			while ( boost::xpressive::regex_search( start, end, what, GetNeedle( FXString::ToString( (LPCTSTR)RegexStatement ).c_str() ), flags ) )
 			{
 				if ( ++count > MaxCount )
 					break;
@@ -576,33 +572,50 @@ void CRegexAssistantDlg::OnEnChangeRegexEditBox_BodyMethod( CString sMarkString 
 	}
 }
 
+CString CRegexAssistantDlg::CopyRegexStatementForUndo()
+{
+	CString RegexStatement;
+	m_RegexStatement_editBx.GetWindowText( RegexStatement );
+	if ( m_LastRegexStatement != RegexStatement)
+	{
+		if ( m_RegexStatementChangesToUndo.size() > MaxUndoRegex )
+			m_RegexStatementChangesToUndo.erase( m_RegexStatementChangesToUndo.begin(), m_RegexStatementChangesToUndo.begin() + 1 );
+		m_RegexStatementChangesToUndo.push_back( m_LastRegexStatement );
+		m_LastRegexStatement = RegexStatement;
+	}
+
+	m_UndoExpressionChange_btn.EnableWindow( m_RegexStatementChangesToUndo.empty() ? FALSE : TRUE );
+	return RegexStatement;
+}
+
 void CRegexAssistantDlg::OnEnChangeRegexEditBox()
 {
-	if ( !m_ScintillaWrapper.IsInit() )
+	if ( !m_ScintillaWrapper.IsInit())
 		return;
-	CString sMarkString;
-	m_RegexStatement_editBx.GetWindowText( sMarkString );
-	UpdateConversionButtonEnableStatus( sMarkString );
-	if ( sMarkString.Right( 1 ) == _T( "\\" ) )
+
+
+	CString RegexStatement = CopyRegexStatementForUndo();
+	UpdateConversionButtonEnableStatus( RegexStatement );
+	if ( RegexStatement.Right( 1 ) == _T( "\\" ) )
 	{
-		if ( sMarkString.GetLength() == 1 )
+		if ( RegexStatement.GetLength() == 1 )
 			return;
-		if ( sMarkString.Right( 2 ) != _T( "\\\\" ) )
+		if ( RegexStatement.Right( 2 ) != _T( "\\\\" ) )
 			return;
 	}
 	if ( IsBoostOrStd_Regex() )
 	{
-		OnEnChangeRegexEditBox( _T( "" ) );		//Call this to make sure previous highlight has been cleared.
-		if ( m_Case_btn.GetCheck() == BST_CHECKED && sMarkString.Left( 4 ) != _T( "(?i)" ) )
+		ChangeRegexEditBox( _T( "" ) );		//Call this to make sure previous highlight has been cleared.
+		if ( m_Case_btn.GetCheck() == BST_CHECKED && RegexStatement.Left( 4 ) != _T( "(?i)" ) )
 		{
 			m_Case_btn.SetCheck( BST_UNCHECKED );
 		}
-		if ( sMarkString.IsEmpty() )
+		if ( RegexStatement.IsEmpty() )
 			return;
 		if ( IsMultiline() )
-			OnEnChangeRegexEditBox_BodyMethod( sMarkString );
+			ChangeRegexEditBox_BodyMethod( RegexStatement );
 		else
-			OnEnChangeRegexEditBox_LineByLine( sMarkString );
+			ChangeRegexEditBox_LineByLine( RegexStatement );
 	} else
 	{
 		DWORD Flag = SCFIND_REGEXP;
@@ -612,7 +625,7 @@ void CRegexAssistantDlg::OnEnChangeRegexEditBox()
 		//	Flag |= SCFIND_CXX11REGEX;  //This version of Scintilla does not have this flag
 		if ( m_Case_btn.GetCheck() != BST_CHECKED )
 			Flag |= SCFIND_MATCHCASE;
-		OnEnChangeRegexEditBox( sMarkString, Flag );
+		ChangeRegexEditBox( RegexStatement, Flag );
 	}
 }
 
@@ -621,13 +634,13 @@ void CRegexAssistantDlg::UpdateWindowTitle()
 	SetWindowText( _T( "Regular Expression Assistant (RegexAssistant) by David Maisonave (aka Axter)" ) );
 }
 
-void CRegexAssistantDlg::UpdateConversionButtonEnableStatus( CString sMarkString )
+void CRegexAssistantDlg::UpdateConversionButtonEnableStatus( CString RegexStatement )
 {
-	if ( sMarkString.Find( _T( "#" ) ) == -1 && sMarkString.Find( _T( "?" ) ) == -1 && sMarkString.Find( _T( "*" ) ) == -1 && sMarkString.Find( _T( "%" ) ) == -1 )
+	if ( RegexStatement.Find( _T( "#" ) ) == -1 && RegexStatement.Find( _T( "?" ) ) == -1 && RegexStatement.Find( _T( "*" ) ) == -1 && RegexStatement.Find( _T( "%" ) ) == -1 )
 	{
 		m_ConvertSqlWildToRegex_btn.EnableWindow( FALSE );
 		m_ConvertFilesysWildToRegex_btn.EnableWindow( FALSE );
-	} else if ( sMarkString.Find( _T( "?" ) ) == -1 && sMarkString.Find( _T( "*" ) ) == -1 )
+	} else if ( RegexStatement.Find( _T( "?" ) ) == -1 && RegexStatement.Find( _T( "*" ) ) == -1 )
 	{
 		m_ConvertSqlWildToRegex_btn.EnableWindow( TRUE );
 		m_ConvertFilesysWildToRegex_btn.EnableWindow( FALSE );
@@ -645,11 +658,11 @@ void CRegexAssistantDlg::OnCbnSelchangeRegexCompatibilitySelectionCombo()
 
 	if ( IsBoostOrStd_Regex( OldRegex_Compalibility ) && !IsBoostOrStd_Regex() )
 	{
-		CString sMarkString;
-		m_RegexStatement_editBx.GetWindowText( sMarkString );
-		if ( sMarkString.Left( 4 ) == _T( "(?i)" ) )
+		CString RegexStatement;
+		m_RegexStatement_editBx.GetWindowText( RegexStatement );
+		if ( RegexStatement.Left( 4 ) == _T( "(?i)" ) )
 		{
-			m_RegexStatement_editBx.SetWindowText( sMarkString.Mid( 4 ) );
+			m_RegexStatement_editBx.SetWindowText( RegexStatement.Mid( 4 ) );
 			m_RegexStatement_editBx.SetFocus();
 			m_RegexStatement_editBx.SetSel( 0, 0 );
 		}
@@ -675,18 +688,27 @@ BOOL CRegexAssistantDlg::OnNotify( WPARAM wParam, LPARAM lParam, LRESULT* pResul
 
 void CRegexAssistantDlg::OnBnClickedReplaceUndoButton()
 {
-	if ( !m_UndoSource.empty() )
+	if ( !m_SampleChangesToUndo.empty() )
 	{
-		string strHaystack = m_UndoSource[m_UndoSource.size() - 1];
-		m_UndoSource.pop_back();
+		string strHaystack = m_SampleChangesToUndo[m_SampleChangesToUndo.size() - 1];
+		m_SampleChangesToUndo.pop_back();
 		m_ScintillaWrapper.SendEditor( SCI_CLEARALL );
 		m_ScintillaWrapper.SendEditor( SCI_APPENDTEXT, strHaystack.size(), reinterpret_cast<sptr_t>(strHaystack.c_str()) );
 	}
 
-	if ( m_UndoSource.empty() )
+	if ( m_SampleChangesToUndo.empty() )
 	{
 		m_UndoRegexReplacementChanges_btn.EnableWindow( FALSE );
 	}
+}
+
+int CRegexAssistantDlg::GetMaxUndoSampleChange( int SampleSize )
+{
+	if ( SampleSize < 50000 )
+		return MaxUndoSample;
+	if ( SampleSize < 500000 )
+		return (int)(MaxUndoSample / 10);
+	return 2;
 }
 
 void CRegexAssistantDlg::FetchTextForUndoArray()
@@ -699,7 +721,9 @@ void CRegexAssistantDlg::FetchTextForUndoArray()
 			std::unique_ptr<char[]> pcBuffer( new char[BufferSize + 1] );
 			m_ScintillaWrapper.SendEditor( SCI_GETTEXT, (uptr_t)BufferSize, reinterpret_cast<sptr_t>(pcBuffer.get()) );
 			pcBuffer[BufferSize] = '\0';
-			m_UndoSource.push_back( pcBuffer.get() );
+			if ( m_SampleChangesToUndo.size() > GetMaxUndoSampleChange(BufferSize))
+				m_SampleChangesToUndo.erase( m_SampleChangesToUndo.begin(), m_SampleChangesToUndo.begin() + 1 );
+			m_SampleChangesToUndo.push_back( pcBuffer.get() );
 			m_UndoRegexReplacementChanges_btn.EnableWindow( TRUE );
 		}
 	} catch ( ... )
@@ -711,11 +735,31 @@ void CRegexAssistantDlg::OnBnClickedReplaceButton()
 {
 	if ( !m_ScintillaWrapper.IsInit() )
 		return;
-	FetchTextForUndoArray();
 	CString NeedleCstr;
 	m_RegexStatement_editBx.GetWindowText( NeedleCstr );
 	CString NeedleReplacementCstr;
 	m_RegexReplacementExpression_editBx.GetWindowText( NeedleReplacementCstr );
+	const wstring strHaystack = NeedleReplacementCstr.operator LPCWSTR();
+	const boost::match_flag_type flag = boost::format_all;
+	const boost::wregex expr{IsNotCompatibleWithBackSlashReplacementToken() ? L"(\\\\)([0-9])" : L"(\\$)([0-9])"};
+	if (( IsNotCompatibleWithBackSlashReplacementToken() || IsNotCompatibleWithDollarSignReplacementToken())
+		&& boost::regex_search( strHaystack, expr, flag ) )
+	{
+		CString Msg;
+		Msg.Format(_T("Can not use character '%c' for \"%s\" compatibility.  Use character '%c' instead.\nTo replace the characters to correct prefix, answer yes.\nTo continue without correcting text, answer no."), 
+					IsNotCompatibleWithBackSlashReplacementToken() ? L'\\' : L'$', m_RegexCompatibilityProperties[m_Regex_Compalibility].Name, IsNotCompatibleWithBackSlashReplacementToken() ? L'$' : L'\\' );
+		int Answer = MessageBox( Msg, _T( "Wrong argument number prefix charactor" ), MB_YESNOCANCEL );
+		if ( Answer == IDCANCEL )
+			return;
+		if ( Answer == IDYES )
+		{
+			wstring NeedleReplacement = IsNotCompatibleWithBackSlashReplacementToken() ? L"\\$$2" : L"\\\\$2";
+			NeedleReplacementCstr = boost::regex_replace( strHaystack, expr, NeedleReplacement, flag ).c_str();
+			m_RegexReplacementExpression_editBx.SetWindowText( NeedleReplacementCstr );
+		}
+	}
+
+	FetchTextForUndoArray();
 	m_bMakingChangeByReplacementLogic = true;
 	if ( IsScintillaRegex() )
 		RegexReplace_Scintilla( NeedleCstr, NeedleReplacementCstr );
@@ -809,7 +853,6 @@ void CRegexAssistantDlg::RegexReplace_LineByLine( CString NeedleCstr, CString Ne
 		Needle = std::regex( s );
 	} catch ( ... )
 	{
-		//ToDo: Add logging logic here
 		MessageBox( _T( "Error while trying to compile replacement string.  Check " ) );
 		return;
 	}
@@ -828,13 +871,12 @@ void CRegexAssistantDlg::RegexReplace_LineByLine( CString NeedleCstr, CString Ne
 				if ( IsStd_Regex() )
 				{
 					ConvertedString = std::regex_replace( strHaystack, Needle, NeedleReplacement, std_regex_compatibility_flag );
-				} else  // Use boost (format_all) as the default method since it works with both $ and \ characters for replace
+				} else
 				{
 					ConvertedString = boost::xpressive::regex_replace( strHaystack, BoostNeedle, NeedleReplacement, boost_compatibility_flag );
 				}
 			} catch ( ... )
 			{
-				//ToDo: Add logging logic here
 				ConvertedString = strHaystack;
 			}
 			HaystackAfterReplacement += ConvertedString;
@@ -909,20 +951,14 @@ bool CRegexAssistantDlg::IsScintillaRegex( Regex_Compatibility regex_compalibili
 
 bool CRegexAssistantDlg::IsNotCompatibleWithBackSlashReplacementToken()
 {
-	if ( IsBoostDefaultRegex() )
-		return true;
-	if ( IsBoostRegex() && IsMultiline() )
-		return true;
-	if ( IsStd_Regex() && !IsSED() )
+	if ( m_RegexCompatibilityProperties[m_Regex_Compalibility].regex_compatibility_basecode & REGEX_SUBSET_DOLLAR_PREFIX_ONLY )
 		return true;
 	return false;
 }
 
 bool CRegexAssistantDlg::IsNotCompatibleWithDollarSignReplacementToken()
 {
-	if ( IsUNIX_OLD_SYNTAX() )
-		return true;
-	if ( IsPOSIX() || IsSED() )
+	if ( m_RegexCompatibilityProperties[m_Regex_Compalibility].regex_compatibility_basecode & REGEX_SUBSET_BACKSLASH_PREFIX_ONLY )
 		return true;
 	return false;
 }
@@ -1014,28 +1050,14 @@ void CRegexAssistantDlg::PopulateTokenList()
 		m_TokenList_list.SetItemText( nIndex, IdxExample, InsertItemsList[i * QtyColumnsInLinst + IdxExample] );
 		m_TokenList_list.SetItemText( nIndex, IdxMatch, InsertItemsList[i * QtyColumnsInLinst + IdxMatch] );
 
-		m_RegexList.push_back( InsertItemsList[i * QtyColumnsInLinst + IdxRegex] );
+		m_TokenListRegexItems.push_back( InsertItemsList[i * QtyColumnsInLinst + IdxRegex] );
 	}
+	m_RunRegexReplacement_btn.EnableWindow( TRUE );
+	m_RegexReplacementExpression_editBx.EnableWindow( TRUE );
+	m_UndoRegexReplacementChanges_btn.EnableWindow( m_SampleChangesToUndo.empty() ? FALSE : TRUE );
+	m_ResetSampleContent_btn.EnableWindow( TRUE );
 
-	//if ( IsScintillaStandardRegex() )
-	//{
-	//	m_RunRegexReplacement_btn.EnableWindow( FALSE );
-	//	m_RegexReplacementExpression_editBx.EnableWindow( FALSE );
-	//	m_UndoRegexReplacementChanges_btn.EnableWindow( FALSE );
-	//	m_ResetSampleContent_btn.EnableWindow( FALSE );
-	//}
-	//else
-	{
-		m_RunRegexReplacement_btn.EnableWindow( TRUE );
-		m_RegexReplacementExpression_editBx.EnableWindow( TRUE );
-		if ( !m_UndoSource.size() )
-			m_UndoRegexReplacementChanges_btn.EnableWindow( FALSE );
-		else
-			m_UndoRegexReplacementChanges_btn.EnableWindow( TRUE );
-		m_ResetSampleContent_btn.EnableWindow( TRUE );
-	}
-
-	if ( m_CurrentRegexStatement.Left( 4 ) == "(?i)" )
+	if ( m_OriginalRegexStatement.Left( 4 ) == "(?i)" )
 		m_Case_btn.SetCheck( BST_CHECKED );
 }
 
@@ -1047,5 +1069,11 @@ void CRegexAssistantDlg::OnBnClickedResetSample()
 
 void CRegexAssistantDlg::OnBnClickedUndoExpressionChange()
 {
-	// TODO: Add your control notification handler code here
+	if ( m_RegexStatementChangesToUndo.size() )
+	{
+		m_LastRegexStatement = m_RegexStatementChangesToUndo[m_RegexStatementChangesToUndo.size() - 1];
+		m_RegexStatementChangesToUndo.pop_back();
+		m_RegexStatement_editBx.SetWindowText( m_LastRegexStatement );
+	}
+	m_UndoExpressionChange_btn.EnableWindow( m_RegexStatementChangesToUndo.empty() ? FALSE : TRUE );
 }

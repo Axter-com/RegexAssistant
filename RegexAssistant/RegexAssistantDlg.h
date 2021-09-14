@@ -36,7 +36,7 @@ class CRegexAssistantDlg : public CDialog
 {
 	DECLARE_DYNAMIC( CRegexAssistantDlg );
 	friend class CRegexAssistantDlgAutoProxy;
-	enum { IdxRegex = 0, IdxDescription = 1, IdxExample = 2, IdxMatch = 3 };
+	enum { IdxRegex = 0, IdxDescription = 1, IdxExample = 2, IdxMatch = 3, MaxUndoRegex = 250, MaxUndoSample = 64	};
 	// Private static member variables
 	static const int QtyColumnsInLinst;
 	static const int MaxInsertItemsList;
@@ -54,9 +54,11 @@ public:
 #endif
 protected:
 	// Functions for internal usage
-	void OnEnChangeRegexEditBox( CString MarkString, DWORD Flag = 0 );
-	void OnEnChangeRegexEditBox_LineByLine( CString MarkString );
-	void OnEnChangeRegexEditBox_BodyMethod( CString MarkString );
+	int GetMaxUndoSampleChange( int SampleSize );
+	CString CopyRegexStatementForUndo();
+	void ChangeRegexEditBox( CString MarkString, DWORD Flag = 0 );
+	void ChangeRegexEditBox_LineByLine( CString MarkString );
+	void ChangeRegexEditBox_BodyMethod( CString MarkString );
 	void UpdateWindowTitle();
 	void UpdateConversionButtonEnableStatus( CString MarkString );
 	void RegexReplace_Scintilla( CString MarkString, CString NeedleReplacementCstr );
@@ -93,9 +95,11 @@ protected:
 	// Member non-static Variables
 	wchar_t *m_py_decodelocale;
 	std::string m_OriginalSampleValue;
-	std::vector<CString> m_RegexList;
-	std::vector<std::string> m_UndoSource;
-	CString m_CurrentRegexStatement;
+	std::vector<CString> m_TokenListRegexItems;
+	std::vector<CString> m_RegexStatementChangesToUndo;
+	std::vector<std::string> m_SampleChangesToUndo;
+	const CString m_OriginalRegexStatement;
+	CString m_LastRegexStatement;
 	CString m_SampleText;
 	int m_MaxViewWidth;
 	int m_MonitorToDisplay;
@@ -128,7 +132,6 @@ public:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg void OnClose();
-	afx_msg void OnBnClickedOk();
 	afx_msg void OnNMDblclkTokenListCtrl( NMHDR *pNMHDR, LRESULT *pResult );
 	afx_msg void OnBnClickedIgnoreCaseCheck();
 	afx_msg void OnBnClickedConvertSqlWildToRegexButton();
@@ -140,7 +143,7 @@ public:
 	afx_msg void OnBnClickedStaticGroupboxTestTargetText();
 	afx_msg void OnBnClickedResetSample();
 	afx_msg void OnBnClickedUndoExpressionChange();
-	inline virtual void OnOK() { OnClose(); };
+	inline virtual void OnOK() {  };
 	inline virtual void OnCancel() { OnClose(); };
 	CStatic m_SampleText_Label_static;
 };
