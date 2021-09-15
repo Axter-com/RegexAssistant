@@ -77,11 +77,11 @@ int ScintillaWrapper::SendEditor( UINT Msg, WPARAM wParam, LPARAM lParam )
 	return (int)0;
 }
 
-CString ScintillaWrapper::TextToFind_to_CString( TextToFind& ft )
+CString ScintillaWrapper::TextToFind_to_CString( Sci_TextToFind& ft )
 {
 	if ( !IsInit() )
 		return _T( "" );
-	TextRange Txrg;
+	Sci_TextRange Txrg;
 	Txrg.chrg.cpMin = ft.chrgText.cpMin;
 	Txrg.chrg.cpMax = ft.chrgText.cpMax;
 	size_t stCchBuffer = Txrg.chrg.cpMax - Txrg.chrg.cpMin + 2;
@@ -110,6 +110,6 @@ bool ScintillaWrapper::SetPersistentSetings()
 }
 
 void ScintillaWrapper::SetExtContextMenuHelper( Sci_ExtContextMenuHelper * sci_extcontextmenuhelper ){
-	::SendMessage( m_hwndScintilla, SCI_SET_EXTCONTEXTMENU, 1, (LPARAM)sci_extcontextmenuhelper );
+	//::SendMessage( m_hwndScintilla, SCI_SET_EXTCONTEXTMENU, 1, (LPARAM)sci_extcontextmenuhelper );
 }
 

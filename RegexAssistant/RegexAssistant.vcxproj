@@ -43,7 +43,7 @@
     <ProjectGuid>{56B23F15-38BE-4A4D-BD7D-0D5213D2AEB7}</ProjectGuid>
     <Keyword>MFCProj</Keyword>
     <RootNamespace>RegexAssistant</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.20348.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -111,20 +111,44 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\bin\build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\bin\build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\bin\build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <CustomBuildAfterTargets />
+    <OutDir>$(SolutionDir)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\bin\build\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <OutDir>$(SolutionDir)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\bin\build\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|ARM'">
+    <OutDir>$(SolutionDir)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\bin\build\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <OutDir>$(SolutionDir)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\bin\build\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">
+    <OutDir>$(SolutionDir)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\bin\build\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">
+    <OutDir>$(SolutionDir)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\bin\build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -142,7 +166,7 @@
       <SubSystem>Windows</SubSystem>
       <RegisterOutput>true</RegisterOutput>
       <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -173,7 +197,7 @@
       <SubSystem>Windows</SubSystem>
       <RegisterOutput>true</RegisterOutput>
       <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -209,7 +233,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <RegisterOutput>true</RegisterOutput>
       <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <Midl>
@@ -250,7 +274,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <RegisterOutput>true</RegisterOutput>
       <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <Midl>
@@ -269,9 +293,9 @@
       <Command>msbuild.exe ..\$(ProjectName).sln /p:Configuration=Release /p:Platform="x86"</Command>
       <Command>msbuild.exe ..\$(ProjectName).sln /p:Configuration=Release /p:Platform="x86"
 IF EXIST  "%temp%\$(ProjectName).exe" DEL /Q /F "%temp%\$(ProjectName).exe"
-copy /Y "$(SolutionDir)\$(Platform)\$(Configuration)\$(ProjectName).exe" "%temp%\$(ProjectName).exe"
+copy /Y "$(OutDir)\$(ProjectName).exe" "%temp%\$(ProjectName).exe"
 powershell $env:PROJECTVERSION=[string](get-item %temp%\$(ProjectName).exe).VersionInfo.FileVersion  ;  $env:PROJECTCOMPRESSFILENAME=[string]::Concat("'%temp%\$(ProjectName)_v'",[string]$env:PROJECTVERSION,"'_$(Platform).zip'")   ;  Compress-Archive "%temp%\$(ProjectName).exe" "$env:PROJECTCOMPRESSFILENAME" -CompressionLevel Optimal -Force
-copy /Y "$(SolutionDir)\Win32\$(Configuration)\$(ProjectName).exe" "%temp%\$(ProjectName).exe"
+copy /Y "$(OutDir)\..\..\Win32\$(Configuration)\$(ProjectName).exe" "%temp%\$(ProjectName).exe"
 powershell $env:PROJECTVERSION=[string](get-item %temp%\$(ProjectName).exe).VersionInfo.FileVersion  ;  $env:PROJECTCOMPRESSFILENAME=[string]::Concat("'%temp%\$(ProjectName)_v'",[string]$env:PROJECTVERSION,"'_x86.zip'")   ;  Compress-Archive "%temp%\$(ProjectName).exe" "$env:PROJECTCOMPRESSFILENAME" -CompressionLevel Optimal -Force
 copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
 del /Q /F "%temp%\$(ProjectName).exe"
@@ -299,7 +323,7 @@ copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
       <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
       <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -309,7 +333,7 @@ copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
       <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
       <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -319,7 +343,7 @@ copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
       <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
       <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -329,7 +353,7 @@ copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
       <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
       <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -339,7 +363,7 @@ copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
       <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
       <AdditionalDependencies>SciLexer.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

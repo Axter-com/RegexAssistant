@@ -22,13 +22,9 @@ RegexAssistant_i.c
 *.zip
 /boost
 /scintilla
-/x64
-/Win32
+/bin
 /.vs
-/RegexAssistant/x64
-/RegexAssistant/Win32
 /enc_temp_folder
-
 *.aps
 RegexAssistant.7z
 Docs/ProjectImages/RegexAssistant_DefaultStartupScreenSet2.png

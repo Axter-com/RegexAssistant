@@ -1,9 +1,8 @@
 /*
-	Copyright (C) 2021  David Maisonave
+	Copyright (C) 2021 David Maisonave
 	The RegexAssistant source code is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License.
 	This program is distributed in the hope that it will be useful,	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 */
-
 #include "pch.h"
 //#define PY_SSIZE_T_CLEAN
 //#include <Python.h>
@@ -17,7 +16,6 @@
 #include "MultiMonitors.h"
 #include "include/Scintilla.h"
 #include <vector>
-
 #include "ClipboardXX.hpp"
 #include "CAboutDlg.h"
 #include <boost/regex.hpp>
@@ -409,7 +407,7 @@ void CRegexAssistantDlg::ChangeRegexEditBox( CString RegexStatement, DWORD Flag 
 {
 	long Start = 0, Stop = INT_MAX;
 	int Marker = GetMarkerID();
-	TextToFind ft = {0};
+	Sci_TextToFind ft = {0};
 	int iLineIndex = 0;
 	m_ScintillaWrapper.SendEditor( SCI_CLEARDOCUMENTSTYLE );
 
@@ -495,7 +493,7 @@ void CRegexAssistantDlg::ChangeRegexEditBox_LineByLine( CString RegexStatement )
 				{
 					if ( ++count > MaxCount )
 						break;
-					TextToFind ft = {0};
+					Sci_TextToFind ft = {0};
 					string::const_iterator NeedleStart = what[0].first;
 					string::const_iterator NeedleEnd = what[0].second;
 					ft.chrgText.cpMin = CurrentLineBytePos + (long)std::distance( itHaystackStart, NeedleStart );
@@ -514,7 +512,7 @@ void CRegexAssistantDlg::ChangeRegexEditBox_LineByLine( CString RegexStatement )
 				{
 					if ( ++count > MaxCount )
 						break;
-					TextToFind ft = {0};
+					Sci_TextToFind ft = {0};
 					string::const_iterator NeedleStart = what[0].first;
 					string::const_iterator NeedleEnd = what[0].second;
 					ft.chrgText.cpMin = CurrentLineBytePos + (long)std::distance( itHaystackStart, NeedleStart );
@@ -554,7 +552,7 @@ void CRegexAssistantDlg::ChangeRegexEditBox_BodyMethod( CString RegexStatement )
 				if ( ++count > MaxCount )
 					break;
 
-				TextToFind ft = {0};
+				Sci_TextToFind ft = {0};
 				string::const_iterator NeedleStart = what[0].first;
 				string::const_iterator NeedleEnd = what[0].second;
 				ft.chrgText.cpMin = (long)std::distance( itHaystackStart, NeedleStart );
@@ -1024,10 +1022,11 @@ void CRegexAssistantDlg::PopulateTokenList()
 	m_TokenList_list.SetRedraw( FALSE );
 	m_TokenList_list.DeleteAllItems();
 	m_TokenList_list.SetRedraw( TRUE );
+	m_TokenListRegexItems.clear();
 	for ( int i = 0; i < (MaxInsertItemsList - 1); ++i )
 	{
-		//REGEX_COMPATIBILITY_BOOST_ALL, REGEX_COMPATIBILITY_BOOST_PERL, and REGEX_COMPATIBILITY_SCINTILLA_POSIX works with both replacement syntax characters ($ and \)
-		//But the remaining only work with one or don't, so use below if condition to avoid display syntax which doesn't apply to the selected compatibility option.
+		// BOOST_ALL, PERL, and POSIX works with both replacement syntax characters ($ and \)
+		// Use below if condition to avoid displaying syntax which doesn't apply to the selected compatibility
 		if ( InsertItemsList[i * QtyColumnsInLinst + IdxDescription].Left( 1 ) == "~" ) // Items only compatible with regex types that support backslash with replacement numbers
 		{
 			if ( IsNotCompatibleWithBackSlashReplacementToken() )
@@ -1040,11 +1039,16 @@ void CRegexAssistantDlg::PopulateTokenList()
 		{
 			if ( IsScintillaRegex() )
 				continue;
+		} else if ( InsertItemsList[i * QtyColumnsInLinst + IdxDescription].Left( 1 ) == "#" ) //Items not compatible with std::regex
+		{
+			if ( IsStd_Regex() )
+				continue;
 		}
 
 		CString Description = InsertItemsList[i * QtyColumnsInLinst + IdxDescription];
-		if ( InsertItemsList[i * QtyColumnsInLinst + IdxDescription].Left( 1 ) == "*" || InsertItemsList[i * QtyColumnsInLinst + IdxDescription].Left( 1 ) == "~" || InsertItemsList[i * QtyColumnsInLinst + IdxDescription].Left( 1 ) == "$" )
-			Description = InsertItemsList[i * QtyColumnsInLinst + IdxDescription].Mid( 1 );
+		if ( InsertItemsList[i * QtyColumnsInLinst + IdxDescription].Left( 1 ) == "*" || InsertItemsList[i * QtyColumnsInLinst + IdxDescription].Left( 1 ) == "~" || 
+			 InsertItemsList[i * QtyColumnsInLinst + IdxDescription].Left( 1 ) == "$" || InsertItemsList[i * QtyColumnsInLinst + IdxDescription].Left( 1 ) == "#" )
+			Description = InsertItemsList[i * QtyColumnsInLinst + IdxDescription].Mid( 1 ); // Strip out the prefix character
 		int nIndex = m_TokenList_list.InsertItem( i, InsertItemsList[i * QtyColumnsInLinst + IdxRegex] );
 		m_TokenList_list.SetItemText( nIndex, IdxDescription, Description );
 		m_TokenList_list.SetItemText( nIndex, IdxExample, InsertItemsList[i * QtyColumnsInLinst + IdxExample] );

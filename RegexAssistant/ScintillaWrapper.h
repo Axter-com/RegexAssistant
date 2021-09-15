@@ -19,7 +19,7 @@ public:
 	int SendEditor( UINT Msg, WPARAM wParam = 0, LPARAM lParam = 0 );
 	inline bool IsInit() { return (m_ScintillaFunction != NULL); }
 	bool SetPersistentSetings();
-	CString TextToFind_to_CString( TextToFind& ft );
+	CString TextToFind_to_CString( Sci_TextToFind& ft );
 	inline HWND GetWnd() { return m_hwndScintilla; }
 	void SetExtContextMenuHelper( Sci_ExtContextMenuHelper * sci_extcontextmenuhelper );
 
