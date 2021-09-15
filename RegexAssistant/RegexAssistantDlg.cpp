@@ -747,7 +747,7 @@ void CRegexAssistantDlg::OnBnClickedReplaceButton()
 	{
 		CString Msg;
 		Msg.Format(_T("Can not use character '%c' for \"%s\" compatibility.  Use character '%c' instead.\nTo replace the characters to correct prefix, answer yes.\nTo continue without correcting text, answer no."), 
-					IsNotCompatibleWithBackSlashReplacementToken() ? L'\\' : L'$', m_RegexCompatibilityProperties[m_Regex_Compalibility].Name, IsNotCompatibleWithBackSlashReplacementToken() ? L'$' : L'\\' );
+					(IsNotCompatibleWithBackSlashReplacementToken() ? '\\' : '$'), (m_RegexCompatibilityProperties[m_Regex_Compalibility].Name, IsNotCompatibleWithBackSlashReplacementToken() ? '$' : '\\') );
 		int Answer = MessageBox( Msg, _T( "Wrong argument number prefix charactor" ), MB_YESNOCANCEL );
 		if ( Answer == IDCANCEL )
 			return;

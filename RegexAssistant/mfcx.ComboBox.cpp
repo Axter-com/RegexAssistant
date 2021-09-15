@@ -114,9 +114,6 @@ namespace mfcx
 	void ComboBox::Initiate()
 	{
 		m_ListBox->SetParent( this );
-		NONCLIENTMETRICS ncm = {sizeof( NONCLIENTMETRICS )};
-		SystemParametersInfo( SPI_GETNONCLIENTMETRICS, sizeof( NONCLIENTMETRICS ), &ncm, 0 );
-		m_font.CreateFontIndirect( &ncm.lfStatusFont );
 	}
 
 	ComboBox::~ComboBox()
@@ -174,7 +171,7 @@ namespace mfcx
 	void ComboBox::DrawItem( LPDRAWITEMSTRUCT lpDrawItemStruct )
 	{
 		CDC* pDC = CDC::FromHandle( lpDrawItemStruct->hDC );
-		const RECT &rc = lpDrawItemStruct->rcItem;
+		RECT &rc = lpDrawItemStruct->rcItem;
 		BOOL IsItemSelected = (lpDrawItemStruct->itemState & ODS_SELECTED) ? TRUE : FALSE;
 		COLORREF oldTextColor = DEFAULT_COLORS;
 		COLORREF oldBkColor = DEFAULT_COLORS;
@@ -192,11 +189,11 @@ namespace mfcx
 
 			oldTextColor = pDC->SetTextColor( newTextColor );
 			oldBkColor = pDC->SetBkColor( newBkColor );
-
-			pOldFont = pDC->SelectObject( &m_font );
+			pOldFont = pDC->SelectObject( pDC->GetCurrentFont() );
 			GetLBText( lpDrawItemStruct->itemID, strText );
-			pDC->ExtTextOut( rc.left + 2,
-							 rc.top + 2,
+			CRect rectClient( rc );
+			pDC->ExtTextOut( rc.left,
+							 rc.top,
 							 ETO_OPAQUE, &rc,
 							 strText, NULL );
 			CSize TextSize = pDC->GetTextExtent( strText );
@@ -212,7 +209,6 @@ namespace mfcx
 
 			if ( m_hwndItemTip.m_hWnd != NULL && m_ToolTipItemRecievedStr )
 			{
-				CRect rectClient( rc );
 				int nComboButtonWidth = ::GetSystemMetrics( SM_CXHTHUMB ) + 2;
 				rectClient.right = rectClient.right - nComboButtonWidth;
 				ClientToScreen( &rectClient );

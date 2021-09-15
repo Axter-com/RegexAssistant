@@ -119,7 +119,6 @@ namespace mfcx
 		const COLORREF m_EnabledSelectColor;
 		const COLORREF m_EnabledSelectBkColor;
 		std::vector<std::shared_ptr<ComboBoxItemDetails> > m_vComboBoxItemDetails;
-		CFont m_font;
 	protected:
 		CString m_strSavedText;	// saves text between OnSelendok and OnRealSelEndOK calls
 		std::unique_ptr<ComboBoxListBox> m_ListBox;
