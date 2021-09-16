@@ -21,7 +21,6 @@ public:
 	bool SetPersistentSetings();
 	CString TextToFind_to_CString( Sci_TextToFind& ft );
 	inline HWND GetWnd() { return m_hwndScintilla; }
-	void SetExtContextMenuHelper( Sci_ExtContextMenuHelper * sci_extcontextmenuhelper );
 
 protected:
 	friend class CRegexAssistantDlg;

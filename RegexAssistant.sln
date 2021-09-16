@@ -4,8 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.28307.1585
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RegexAssistant", "RegexAssistant\RegexAssistant.vcxproj", "{56B23F15-38BE-4A4D-BD7D-0D5213D2AEB7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{19CCA8B8-46B9-4609-B7CE-198DA19F07BD} = {19CCA8B8-46B9-4609-B7CE-198DA19F07BD}
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scintilla", "scintilla\win32\Scintilla.vcxproj", "{19CCA8B8-46B9-4609-B7CE-198DA19F07BD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scintilla", "Scintilla.vcxproj", "{19CCA8B8-46B9-4609-B7CE-198DA19F07BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

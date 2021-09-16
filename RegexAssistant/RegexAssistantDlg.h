@@ -4,7 +4,7 @@
 	This program is distributed in the hope that it will be useful,	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 */
 #pragma once
-#include "RegexAssistant.h"
+#include "RegexAssistantDlg_enums.h"
 #include <vector>
 #include <map>
 #include <string>
@@ -12,7 +12,6 @@
 #include "mfcx.ComboBox.h"
 #include <boost/xpressive/xpressive.hpp>
 
-#define REPORT_ERR_AND_EXIT(exit_err_no, msg_format, ...) {CString msg; msg.Format(_T("Error:  " msg_format "  Performming early exit due to error."),__VA_ARGS__);AfxMessageBox(msg);exit(exit_err_no);}
 class CRegexAssistantDlgAutoProxy;
 struct MARKERDATAtag
 {
@@ -23,20 +22,20 @@ struct MARKERDATAtag
 
 struct RegexCompatibilityProperties
 {
-	CString Name; // Name shown on the GUI dropdown list
-	enum Regex_Compatibility regex_compatibility_ID; //ID unique to this option
-	int regex_compatibility_basecode; //Base implementation
-	BOOL IsItemEnabled; // Set true if fully implemented or compiling in debug mode.
-	std::string CommandLineOption; // string used on command line to select this compatibility
-	std::string HelpTip; // Summary of type
-	int HighLightIndexID;
+	CString Name;								// Name shown on the dropdown list
+	enum Regex_Compatibility CompatibilityID;	// ID unique to this option
+	int CompatibilityAttributes;				// Base implementation
+	BOOL IsItemEnabled;							// Set true if fully implemented or compiling in debug mode.
+	std::string CommandLineOption;				// string used on command line to select this compatibility
+	std::string HelpTip;						// Summary of type
+	int HighLightIndexID;						// Color index to mark text in the sample window
 };
 
 class CRegexAssistantDlg : public CDialog
 {
 	DECLARE_DYNAMIC( CRegexAssistantDlg );
 	friend class CRegexAssistantDlgAutoProxy;
-	enum { IdxRegex = 0, IdxDescription = 1, IdxExample = 2, IdxMatch = 3, MaxUndoRegex = 250, MaxUndoSample = 64	};
+	enum { IdxRegex = 0, IdxDescription = 1, IdxExample = 2, IdxMatch = 3, MaxUndoRegex = 250, MaxUndoSample = 64 };
 	// Private static member variables
 	static const int QtyColumnsInLinst;
 	static const int MaxInsertItemsList;
@@ -67,6 +66,7 @@ protected:
 	void FetchTextForUndoArray();
 	void PopulateTokenList();
 	void CreateSizeGrip();
+	void UpdateIgnoreCaseStatus(BOOL UpdateButtonStatus = TRUE);
 	BOOL CanExit();
 	int GetMarkerID();
 	bool IsStd_Regex();
@@ -74,12 +74,12 @@ protected:
 	bool IsBoostDefaultRegex();
 	bool IsBoostAllRegex();
 	bool IsBoostOrStd_Regex();
-	bool IsScintillaRegex();
+	bool IsScintilla();
 	bool IsScintillaStandardRegex();
 	bool IsStd_Regex( Regex_Compatibility regex_compalibility );
 	bool IsBoostRegex( Regex_Compatibility regex_compalibility );
 	bool IsBoostOrStd_Regex( Regex_Compatibility regex_compalibility );
-	bool IsScintillaRegex( Regex_Compatibility regex_compalibility );
+	bool IsScintilla( Regex_Compatibility regex_compalibility );
 	bool IsNotCompatibleWithBackSlashReplacementToken();
 	bool IsNotCompatibleWithDollarSignReplacementToken();
 	bool IsPOSIX();
@@ -103,14 +103,14 @@ protected:
 	CString m_SampleText;
 	int m_MaxViewWidth;
 	int m_MonitorToDisplay;
-	BOOL m_bCase;
+	BOOL m_IgnoreCase;
 	bool m_bMakingChangeByReplacementLogic;
 	DWORD m_dwLastErr;
 	Regex_Compatibility m_Regex_Compalibility;
 	ScintillaWrapper m_ScintillaWrapper;
 	CRegexAssistantDlgAutoProxy* m_pAutoProxy;
 	CRegexAssistantApp::SampleLoadMethod m_SampleLoadMethod;
-	HWND			m_hSizeGrip;			// handle of the size grip
+	HWND m_hSizeGrip; // handle of the size grip at the bottom right corner of the main window
 	HICON m_hIcon;
 	// Controls
 	CEdit m_RegexStatement_editBx;
@@ -143,7 +143,7 @@ public:
 	afx_msg void OnBnClickedStaticGroupboxTestTargetText();
 	afx_msg void OnBnClickedResetSample();
 	afx_msg void OnBnClickedUndoExpressionChange();
-	inline virtual void OnOK() {  };
+	inline virtual void OnOK() {};
 	inline virtual void OnCancel() { OnClose(); };
 	CStatic m_SampleText_Label_static;
 };

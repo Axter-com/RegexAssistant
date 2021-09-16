@@ -1,41 +1,16 @@
 //Note: This file should only be included in RegexAssistantDlg.cpp
 //Initialize static members of CRegexAssistantDlg
+#include "RegexAssistantDlg_enums.h"
+
 const MARKERDATAtag CRegexAssistantDlg::m_MarkerData[] = {
-	{RGB( 0, 0, 0 )/*Black*/, RGB( 0, 255, 0 )/*Lime*/, FALSE},       //(Green) For Boost
+{RGB( 0, 0, 0 )/*Black*/, RGB( 0, 255, 0 )/*Lime*/, FALSE},       //(Green) For Boost
 {RGB( 0, 0, 0 )/*Black*/, RGB( 255, 255, 0 )/*Yellow*/, FALSE},   // For REGEX_COMPATIBILITY_SCINTILLA_POSIX
 {RGB( 0, 0, 0 )/*Black*/, RGB( 0, 255, 255 )/*Cyan*/, FALSE},     //For STD Regex and STD SED
 {RGB( 0, 0, 0 /*Black*/ ), RGB( 255, 128, 0 )/*Orange*/, FALSE},  //For REGEX_COMPATIBILITY_SCINTILLA
 {RGB( 0, 0, 0 /*Black*/ ), RGB( 254, 185, 170 )/*Pink*/, FALSE}  //For Java
 };
 
-enum
-{
-	RGB_Lime,
-	RGB_YELLOW,
-	RGB_Cyan,
-	RGB_Orange,
-	RGB_Pink,
-	NUM_OF_MARKERS,
 
-	REGEX_SUBSET_SCINTILLA = 128,		//See https://www.scintilla.org/SciTERegEx.html
-	REGEX_SUBSET_BOOST = 256,
-	REGEX_SUBSET_BOOST_ALL = 512,
-	REGEX_SUBSET_STD_REGEX = 2048,
-	REGEX_SUBSET_PCRE2 = 4096,
-	REGEX_SUBSET_RE2 = 8192,
-	REGEX_SUBSET_DOTNET = 16384,
-	REGEX_SUBSET_PYTHON = 32768,
-	REGEX_SUBSET_JAVA = 65536,
-
-	REGEX_SUBSET_UNIX_OLD_SYNTAX = REGEX_SUBSET_JAVA * 2,
-	REGEX_SUBSET_PERL = REGEX_SUBSET_UNIX_OLD_SYNTAX * 2,
-	REGEX_SUBSET_MULTILINE = REGEX_SUBSET_PERL * 2,
-	REGEX_SUBSET_SED = REGEX_SUBSET_MULTILINE * 2,
-	REGEX_SUBSET_POSIX = REGEX_SUBSET_SED * 2,
-
-	REGEX_SUBSET_DOLLAR_PREFIX_ONLY = REGEX_SUBSET_POSIX * 2,
-	REGEX_SUBSET_BACKSLASH_PREFIX_ONLY = REGEX_SUBSET_DOLLAR_PREFIX_ONLY * 2
-};
 
 #define NOT_IMPLEMENTED FALSE, "", "Awaiting Implementation", 0
 
@@ -66,8 +41,9 @@ const RegexCompatibilityProperties CRegexAssistantDlg::m_RegexCompatibilityPrope
 {_T( "RUBY" ), REGEX_COMPATIBILITY_RUBY, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL | REGEX_SUBSET_MULTILINE), NOT_IMPLEMENTED},//use boost perl, plus added conversion
 {_T( "Scintilla" ), REGEX_COMPATIBILITY_Scintilla, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_UNIX_OLD_SYNTAX | REGEX_SUBSET_BACKSLASH_PREFIX_ONLY), TRUE, "Scintilla", "Default Scintilla. Uses Old UNIX regex syntax", RGB_YELLOW},
 {_T( "Scintilla POSIX" ), REGEX_COMPATIBILITY_SCINTILLAPOSIX, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_POSIX | REGEX_SUBSET_BACKSLASH_PREFIX_ONLY), TRUE, "POSIX", "Scintilla POSIX syntax", RGB_YELLOW},
-{_T( "SED" ), REGEX_COMPATIBILITY_SED, (REGEX_SUBSET_BOOST | REGEX_SUBSET_SED | REGEX_SUBSET_BACKSLASH_PREFIX_ONLY), TRUE, "SED", "SED via Boost SED (regex_constants::format_sed)", RGB_YELLOW},
-{_T( "SED C++" ), REGEX_COMPATIBILITY_CPP_REGEX_SED, (REGEX_SUBSET_STD_REGEX | REGEX_SUBSET_SED | REGEX_SUBSET_BACKSLASH_PREFIX_ONLY), TRUE, "SED", "SED via C++ STD Regex SED (regex_constants::format_sed)", RGB_YELLOW},
+{_T( "Scintilla SED" ), REGEX_COMPATIBILITY_SCINTILLAPOSIX, (REGEX_SUBSET_SCINTILLA | REGEX_SUBSET_SED | REGEX_SUBSET_BACKSLASH_PREFIX_ONLY), TRUE, "ScintillaSED", "Scintilla with flag CXX11REGEX, which uses the C++ Regex (SED) built with Scintilla. **Warning: Replacement logic has very poor performance", RGB_YELLOW},
+{_T( "Boost SED" ), REGEX_COMPATIBILITY_SED, (REGEX_SUBSET_BOOST | REGEX_SUBSET_SED | REGEX_SUBSET_BACKSLASH_PREFIX_ONLY), TRUE, "SED", "SED via Boost SED (regex_constants::format_sed)", RGB_YELLOW},
+{_T( "C++ SED" ), REGEX_COMPATIBILITY_CPP_REGEX_SED, (REGEX_SUBSET_STD_REGEX | REGEX_SUBSET_SED | REGEX_SUBSET_BACKSLASH_PREFIX_ONLY), TRUE, "CPPSED", "SED via C++ STD Regex SED (regex_constants::format_sed)", RGB_YELLOW},
 {_T( "TCL" ), REGEX_COMPATIBILITY_TCL, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL), TRUE, "TCL", "TCL via Boost Perl (regex_constants::format_perl)", RGB_Cyan},
 {_T( "VBSCRIPT" ), REGEX_COMPATIBILITY_VBSCRIPT, (REGEX_SUBSET_BOOST | REGEX_SUBSET_PERL), TRUE, "VBSCRIPT", "Using Boost Perl to emulate VBSCRIPT Regex. (regex_constants::format_perl)", RGB_Cyan},//Same as javascript
 {_T( "VIM" ), REGEX_COMPATIBILITY_VIM, (REGEX_SUBSET_BOOST | REGEX_SUBSET_BOOST_ALL | REGEX_SUBSET_MULTILINE), NOT_IMPLEMENTED},//Do conversions with boost all   "Old UNIX Style (Default Scintilla)"
@@ -85,6 +61,9 @@ const CString CRegexAssistantDlg::InsertItemsList[] =
 {
 	//Item starting with *, are patterns which do not work with Scintilla
 	//Item starting with #, are patterns which do not work with std::regex
+	//Item starting with ~, (\1\2) works with Boost Regex, *Scintilla-Standard, *POSIX, boost Perl, *Boost Sed, *STD SED
+	//Item starting with $, ($1$2) works with Boost Regex, boost Perl, *Boost Multiline, *boost default, *STD regex
+	//Item starting with @, are patterns which only works on boost with multiline option
 	INSERT_ITEMS_LIST( "A single character",											".", "a.c", "abc, aac, acc, adc, aec, ..." ),
 	INSERT_ITEMS_LIST( "Zero or more of previous expression",							"*", "ab*c", "ac, abc, abbc, abbbc, ..." ),
 	INSERT_ITEMS_LIST( "Zero or 1 of previous expression",								"?", "ab?c", "ac, abc" ),
@@ -112,6 +91,8 @@ const CString CRegexAssistantDlg::InsertItemsList[] =
 	INSERT_ITEMS_LIST( "Non-digit",														"[^0-9]", "cat[^0-9]ood", "cat@ood, cathood, catWood" ),
 	INSERT_ITEMS_LIST( "Non-letter",													"[^a-zA-Z]", "cat[^a-zA-Z]ood", "cat@ood, cat9ood, cat$ood" ),
 	INSERT_ITEMS_LIST( "Printable character(s) (non-whitespace)",						"\\S+", "", "" ),
+	INSERT_ITEMS_LIST( "@Start case-insensitive match",									"(?i)", "(?i)foo\\S*", "foobar, Foobar, FooBar" ),
+	INSERT_ITEMS_LIST( "@Start (default) case-sensitive match",							"(?-i)", "(?i)foo\\S*", "foobar, Foobar, FooBar" ),
 	INSERT_ITEMS_LIST( "*Lookahead",													"(?=)", "foo(?=bar)", "foobar" ),
 	INSERT_ITEMS_LIST( "*Lookahead Not",												"(?!)", "foo(?!bar)", "food foofoo" ),
 	INSERT_ITEMS_LIST( "Windows return/new line",										"\\r\\n", "", "" ),
@@ -148,8 +129,6 @@ const CString CRegexAssistantDlg::InsertItemsList[] =
 	INSERT_ITEMS_LIST( "Find function with 3 arguments pattern",						"(func_name)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "(CreateFoo)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "CreateFoo(ArgData, arg2, arg3)" ),
 	INSERT_ITEMS_LIST( "Find function with 4 arguments pattern",						"(func_name)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "(CreateFoo)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "CreateFoo(ArgData, arg2, arg3, arg4)" ),
 	INSERT_ITEMS_LIST( "Find function with 5 arguments pattern",						"(func_name)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "(CreateFoo)\\s*\\(\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\,\\s*([0-9a-zA-Z_\"']*)\\s*\\)", "CreateFoo(ArgData, arg2, arg3, arg4, arg5)" ),
-	//Item starting with ~, (\1\2) works with Boost Regex, *Scintilla-Standard, *POSIX, boost Perl, *Boost Sed, *STD SED
-	//Item starting with $, ($1$2) works with Boost Regex, boost Perl, *Boost Multiline, *boost default, *STD regex
 	//Item starting with 1,2,or 3 in the second character of the second column, are patterns which can only be used for replacement regex field, and when double clicked will get inserted into replacement field.
 	INSERT_ITEMS_LIST( "~1st Argument for replacement token",							"\\1", "", "" ),
 	INSERT_ITEMS_LIST( "~2nd Argument for replacement token",							"\\2", "", "" ),
@@ -218,13 +197,14 @@ Here is an exercise to get more familiar with the program interface.\r\n\
 5. Reposition the cursor to the end, and double click $ on the token list. Notice only the matching words that are at the end of a line are highlighted.\r\n\
 6. Reposition the cursor to the start, and double click the ^ on the token list. Notice only matching single word lines are highlighted.\r\n\
 foolhardier\r\n\
-foolery frog beach cake foothill run fish foul ball film star flight footlights space footstools\r\n\
-Footnotes said the footdraggers took footage of a foolish footman as he foozled the putt playing golf in a football field\r\n\
+foolery frog beach cake ballfoot Fool foothill run fish foul ball film star flight footlights space footstools\r\n\
+Footnotes said the footdraggers took Footage of a foolish footman as he foozled the putt playing golf in a football field\r\n\
 David posted file c:\\foothill.doc to site http://www.foodie.com and put a copy in the footlocker\r\n\
 David Maisonave plays football better then Foosball, but he is footloose in zip code 08015-6912\r\n\
 The IP address 10.165.132.95 comes from a 19133 zip code area, which is where 800-969-2030 and 555.345.1200 is located.\r\n\
 c:\\film.txt          foozle\r\n\
 footlights           David\r\n\
+tomfoolery           tom-foolery\r\n\
 foodie               Friday\r\n\
 More test text below......\r\n\
 /sub/subsub/subsubsub/footsteps/footlocker.cvf\r\n\

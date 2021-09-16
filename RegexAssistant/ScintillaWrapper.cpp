@@ -4,8 +4,7 @@
 	This program is distributed in the hope that it will be useful,	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 */
 #include "pch.h"
-#include "RegexAssistant.h"
-#include "RegexAssistantDlg.h"
+#include "RegexAssistantDlg_enums.h"
 #include "DlgProxy.h"
 #include "afxdialogex.h"
 #include "CommonFunctions.h"
@@ -22,7 +21,8 @@ ScintillaWrapper::ScintillaWrapper( HWND hwndScintilla ) :m_hwndScintilla( NULL 
 	Init( hwndScintilla );
 }
 
-ScintillaWrapper::~ScintillaWrapper(){
+ScintillaWrapper::~ScintillaWrapper()
+{
 	Scintilla_ReleaseResources();
 }
 
@@ -104,12 +104,8 @@ bool ScintillaWrapper::SetPersistentSetings()
 	SendEditor( SCI_STYLESETBACK, STYLE_DEFAULT, RGB( 255, 255, 255 ) );
 	SendEditor( SCI_STYLESETFORE, STYLE_DEFAULT, RGB( 0, 0, 0 ) );
 	SendEditor( SCI_SETSELFORE, true, RGB( 0, 0, 0 ) );
-	SendEditor( SCI_SETSELBACK, true, RGB( 198, 0, 0 ) );
+	SendEditor( SCI_SETSELBACK, true, RGB( 228, 246, 254 ) );
 	SendEditor( SCI_STYLECLEARALL, 0, 0 );
 	return true;
-}
-
-void ScintillaWrapper::SetExtContextMenuHelper( Sci_ExtContextMenuHelper * sci_extcontextmenuhelper ){
-	//::SendMessage( m_hwndScintilla, SCI_SET_EXTCONTEXTMENU, 1, (LPARAM)sci_extcontextmenuhelper );
 }
 
