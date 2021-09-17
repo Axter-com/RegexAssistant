@@ -146,4 +146,5 @@ public:
 	inline virtual void OnOK() {};
 	inline virtual void OnCancel() { OnClose(); };
 	CStatic m_SampleText_Label_static;
+	afx_msg void OnDropFiles( HDROP hDropInfo );
 };

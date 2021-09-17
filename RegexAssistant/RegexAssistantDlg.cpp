@@ -241,6 +241,7 @@ BEGIN_MESSAGE_MAP( CRegexAssistantDlg, CDialog )
 	ON_BN_CLICKED( IDC_STATIC_GROUPBOX_TEST_TARGET_TEXT, &CRegexAssistantDlg::OnBnClickedStaticGroupboxTestTargetText )
 	ON_BN_CLICKED( IDC_RESET_SAMPLE, &CRegexAssistantDlg::OnBnClickedResetSample )
 	ON_BN_CLICKED( IDC_UNDO_EXPRESSION_CHANGE, &CRegexAssistantDlg::OnBnClickedUndoExpressionChange )
+	ON_WM_DROPFILES()
 END_MESSAGE_MAP()
 
 void CRegexAssistantDlg::OnSysCommand( UINT nID, LPARAM lParam )
@@ -1090,4 +1091,31 @@ void CRegexAssistantDlg::OnBnClickedUndoExpressionChange()
 		m_RegexStatement_editBx.SetWindowText( m_LastRegexStatement );
 	}
 	m_UndoExpressionChange_btn.EnableWindow( m_RegexStatementChangesToUndo.empty() ? FALSE : TRUE );
+}
+
+
+void CRegexAssistantDlg::OnDropFiles( HDROP hDropInfo )
+{
+	wchar_t FileName[256] = {0};
+	DragQueryFile( hDropInfo, 0, FileName, sizeof( FileName ) );
+
+	CStdioFile file;
+
+	if ( file.Open( FileName, CFile::modeRead | CFile::typeText | CFile::shareDenyNone ) )
+	{
+		m_SampleText = _T( "" );
+		CString Line;
+		while ( file.ReadString( Line ) )
+			m_SampleText += Line + _T("\n");
+		if ( m_SampleText.GetLength() > 0 )
+		{
+			string strText = FXString::ToString( m_SampleText.operator LPCWSTR() );
+			m_ScintillaWrapper.SendEditor( SCI_CLEARALL );
+			m_ScintillaWrapper.SendEditor( SCI_APPENDTEXT, strText.length(), reinterpret_cast<sptr_t>(strText.c_str()) );
+		}
+		file.Close();
+	}
+
+
+	CDialog::OnDropFiles( hDropInfo );
 }
