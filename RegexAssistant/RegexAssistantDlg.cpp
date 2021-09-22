@@ -10,8 +10,6 @@
 //	ToDo: Add Hide/Unhide token list window
 //	ToDo: See if the UNDO button can be made with drown option which has the SQL, FileSys, and Ignore Case options.
 #include "pch.h"
-//#define PY_SSIZE_T_CLEAN
-//#include <Python.h>
 #include <afxlayout.h>
 #include <boost/regex.hpp>
 #include <boost/xpressive/xpressive_fwd.hpp>
@@ -54,18 +52,6 @@ CRegexAssistantDlg::CRegexAssistantDlg( CString regex_search, CString regex_repl
 	, m_py_decodelocale( NULL ), m_RegexCompatibility_cmbx( _T( "Items in grey, are awaiting implementation." ), mfcx::DisableColorRefSet( RGB( 105, 105, 105 ), RGB( 169, 169, 169 ) ) )
 {
 	_ASSERT_EXPR( (sizeof( m_MarkerData ) / sizeof( MARKERDATAtag )) == NUM_OF_MARKERS, _T( "Make sure the number of enums before NUM_OF_MARKERS, is equal to the number of MARKERDATAtag in m_MarkerData" ) );
-	//if ( m_bMakingChangeByReplacementLogic )
-	//{
-	//	m_py_decodelocale = Py_DecodeLocale( __argv[0], 0 );
-	//	if ( m_py_decodelocale == NULL )
-	//		REPORT_ERR_AND_EXIT( -6, "Fatal error: Py_DecodeLocale failed!" );
-	//	Py_SetProgramName( m_py_decodelocale );
-	//	Py_Initialize();
-	//	PyRun_SimpleString( "from time import time,ctime\n"
-	//						"print('Hello World.  Today is', ctime(time()))\n" );
-	//	Py_FinalizeEx();
-	//}
-
 	if ( sampleloadmethod == SampleLoadMethod::SampleLoadFromCommandLine )
 		m_SampleText = Sample;
 	else if ( sampleloadmethod == SampleLoadMethod::SampleLoadFromClipboard )
