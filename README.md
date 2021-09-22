@@ -77,17 +77,4 @@ The RegexAssistant folder should look like the following:
 Open the solution using Visual Studio, and press the F7 key to build the solution.
 
 
-## To-Do
-* Add logic to allow window to shrink down further
-* Add logic to remember last window size and position (to include monitor)
-* Add split line to allow user to change size ratio of the token window against the sample window.
-* Add button that will replace the target text with clipboard content
-* Add button that will append the target text field with clipboard content
-* Add command line option that will replace target text with clipboard content when the program starts
-* Add command line option to populate the regex input field on program startup
-* Add command line option to perform a regex replace on a file or multiple files matching DOS wildcards
-* Add context menu item to replace (or append) sample with multiple sets of examples designed for each pattern listed in the token  list
-* Add Build button which disables real time results
-* Add logic to perform file find, rename, delete, & move based on the regex patterns
-* Add drag and drop logic for sample window.
 
