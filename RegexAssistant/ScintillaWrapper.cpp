@@ -4,14 +4,10 @@
 	This program is distributed in the hope that it will be useful,	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 */
 #include "pch.h"
-#include "RegexAssistantDlg_enums.h"
-#include "DlgProxy.h"
-#include "afxdialogex.h"
 #include "CommonFunctions.h"
 #include "ScintillaWrapper.h"
-#include <vector>
+#include "RegexAssistant.h"
 #include <string>
-#include <memory>
 
 ScintillaWrapper::ScintillaWrapper( HWND hwndScintilla ) :m_hwndScintilla( NULL ), m_ScintillaInst( NULL ), m_ScintillaFunction( NULL )
 {
@@ -43,6 +39,16 @@ bool ScintillaWrapper::Init( HWND hwndScintilla )
 	{
 		REPORT_ERR_AND_EXIT( -2, "Could not get Scintilla function pointer!" );
 	}
+
+	std::string FontName = "Courier New";
+	SendEditor( SCI_STYLESETFONT, STYLE_DEFAULT, reinterpret_cast<sptr_t>(FontName.c_str()) );
+	SendEditor( SCI_STYLESETSIZE, STYLE_DEFAULT, 10 );
+	SendEditor( SCI_STYLESETBACK, STYLE_DEFAULT, RGB( 255, 255, 255 ) );
+	SendEditor( SCI_STYLESETFORE, STYLE_DEFAULT, RGB( 0, 0, 0 ) );
+	SendEditor( SCI_SETSELFORE, true, RGB( 0, 0, 0 ) );
+	SendEditor( SCI_SETSELBACK, true, RGB( 228, 246, 254 ) );
+	SendEditor( SCI_STYLECLEARALL, 0, 0 );
+
 	return true;
 }
 
@@ -74,38 +80,45 @@ int ScintillaWrapper::SendEditor( UINT Msg, WPARAM wParam, LPARAM lParam )
 
 	if ( IsInit() )
 		return (int)m_ScintillaFunction( m_ScintillaInst, Msg, wParam, lParam );
-	return (int)0;
+	return 0;
 }
 
-CString ScintillaWrapper::TextToFind_to_CString( Sci_TextToFind& ft )
+int ScintillaWrapper::SendEditor( UINT Msg, WPARAM value1, const std::string &value2 )
 {
-	if ( !IsInit() )
-		return _T( "" );
-	Sci_TextRange Txrg;
-	Txrg.chrg.cpMin = ft.chrgText.cpMin;
-	Txrg.chrg.cpMax = ft.chrgText.cpMax;
-	size_t stCchBuffer = Txrg.chrg.cpMax - Txrg.chrg.cpMin + 2;
-	std::unique_ptr<char> apBuffer( new char[stCchBuffer] );
-	apBuffer.get()[0] = '\0';
-	Txrg.lpstrText = apBuffer.get();
-	SendEditor( SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&Txrg) );
-
-	return FXString::ToWString( apBuffer.get() ).c_str();
+	return SendEditor( Msg, static_cast<WPARAM>(value1), reinterpret_cast<sptr_t>(value2.c_str()) );
 }
 
-
-bool ScintillaWrapper::SetPersistentSetings()
+int ScintillaWrapper::SendEditor( UINT Msg, WPARAM value1, const CString &value2 )
 {
-	if ( !IsInit() )
-		return false;
-	CString FontName = _T( "Courier New" );
-	SendEditor( SCI_STYLESETFONT, STYLE_DEFAULT, reinterpret_cast<sptr_t>(FXString::ToString( (LPCTSTR)FontName ).c_str()) );
-	SendEditor( SCI_STYLESETSIZE, STYLE_DEFAULT, 10 );
-	SendEditor( SCI_STYLESETBACK, STYLE_DEFAULT, RGB( 255, 255, 255 ) );
-	SendEditor( SCI_STYLESETFORE, STYLE_DEFAULT, RGB( 0, 0, 0 ) );
-	SendEditor( SCI_SETSELFORE, true, RGB( 0, 0, 0 ) );
-	SendEditor( SCI_SETSELBACK, true, RGB( 228, 246, 254 ) );
-	SendEditor( SCI_STYLECLEARALL, 0, 0 );
-	return true;
+	return SendEditor( Msg, static_cast<WPARAM>(value1), reinterpret_cast<sptr_t>(Common::ToString( value2 ).c_str()) );
+}
+
+int ScintillaWrapper::SendEditor( UINT Msg, const std::string &value )
+{
+	return SendEditor( Msg, static_cast<WPARAM>(value.length()), reinterpret_cast<sptr_t>(value.c_str()) );
+}
+
+int ScintillaWrapper::SendEditor( UINT Msg, const CString &value )
+{
+	return SendEditor( Msg, static_cast<WPARAM>(value.GetLength()), reinterpret_cast<sptr_t>(Common::ToString( value ).c_str()) );
+}
+
+int ScintillaWrapper::SetStartStyling( const Sci_TextToFind &ft, int value )
+{
+	SendEditor( SCI_STARTSTYLING, ft.chrgText.cpMin, 0x1f );
+	return SendEditor( SCI_SETSTYLING, ft.chrgText.cpMax - ft.chrgText.cpMin, value );
+}
+//
+//int ScintillaWrapper::GetText( size_t Size, const char* Value )
+//{
+//	return SendEditor( SCI_GETTEXT, (uptr_t)Size, Value );
+//}
+
+int ScintillaWrapper::GetText( size_t Size, std::unique_ptr<char[]> &pcBuffer, Sci_GetAction sci_getaction )
+{
+	int RetrnVal = SendEditor( (sci_getaction == Sci_GetText ? SCI_GETTEXT : SCI_GETLINE), (uptr_t)Size, reinterpret_cast<sptr_t>(pcBuffer.get()) );
+	if ( RetrnVal > 0 && RetrnVal < Size )
+		pcBuffer[Size] = '\0';
+	return RetrnVal;
 }
 

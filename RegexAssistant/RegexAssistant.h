@@ -15,7 +15,6 @@ class CRegexAssistantApp : public CWinApp
 {
 public:
 	CRegexAssistantApp();
-	enum SampleLoadMethod {SampleLoadDefault, SampleLoadFromCommandLine, SampleLoadFromFile, SampleLoadFromClipboard	};
 public:
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();

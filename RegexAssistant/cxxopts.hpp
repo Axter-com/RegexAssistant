@@ -76,6 +76,7 @@ THE SOFTWARE.
 #define CXXOPTS_NULL_DEREF_IGNORE
 #endif
 
+#include "CommonFunctions.h"
 
 namespace cxxopts
 {
@@ -1556,7 +1557,7 @@ namespace cxxopts
 	class OptionCommonMembers
 	{
 	public:
-		inline std::string ToString( std::wstring src ) { return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes( src ); }
+		inline std::string ToString( std::wstring src ) { return Common::ToString( src ); }
 		inline std::string ToString( const std::string &src ) { return src; }
 	};
 

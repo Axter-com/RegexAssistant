@@ -161,6 +161,7 @@
       <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26495</DisableSpecificWarnings>
       <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -192,6 +193,7 @@
       <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26495</DisableSpecificWarnings>
       <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -226,6 +228,7 @@
       <DisableSpecificWarnings>26495</DisableSpecificWarnings>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -267,6 +270,7 @@
       <DisableSpecificWarnings>26495</DisableSpecificWarnings>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -321,6 +325,7 @@ copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
     <ClCompile>
       <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
       <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OutDir);%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
@@ -331,6 +336,7 @@ copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
     <ClCompile>
       <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
       <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OutDir);%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
@@ -341,6 +347,7 @@ copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
     <ClCompile>
       <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
       <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OutDir);%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
@@ -351,6 +358,7 @@ copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
     <ClCompile>
       <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
       <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OutDir);%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
@@ -361,6 +369,7 @@ copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
     <ClCompile>
       <TreatSpecificWarningsAsErrors>4129</TreatSpecificWarningsAsErrors>
       <AdditionalIncludeDirectories>..\boost;..\scintilla;%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OutDir);%LOCALAPPDATA%\Programs\Python\Python39-$(Platform)\libs</AdditionalLibraryDirectories>
@@ -374,6 +383,7 @@ copy /Y "%temp%\$(ProjectName)_*.zip"  "$(SolutionDir)\"
     <ClInclude Include="cxxopts.hpp" />
     <ClInclude Include="DlgProxy.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="mfcx.ColorRefSet.h" />
     <ClInclude Include="mfcx.ComboBox.h" />
     <ClInclude Include="MultiMonitors.h" />
     <ClInclude Include="pch.h" />

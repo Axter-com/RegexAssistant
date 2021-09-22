@@ -25,7 +25,11 @@ RegexAssistant_i.c
 /bin
 /.vs
 /enc_temp_folder
+/RegexLibs
 *.aps
 RegexAssistant.7z
 Docs/ProjectImages/RegexAssistant_DefaultStartupScreenSet2.png
 Wix.xml
+PaternsExamplesToAdd.txt
+*.7z
+*.swp

@@ -5,6 +5,7 @@
 */
 #include "pch.h"
 #include "framework.h"
+#include "RegexAssistant.h"
 #include "RegexAssistantDlg.h"
 #include "cxxopts.hpp"
 #include <string>
@@ -85,16 +86,16 @@ BOOL CRegexAssistantApp::InitInstance()
 	
 	if ( arg_result.count( "help" ) )
 	{
-		AfxMessageBox( FXString::ToWString( options.help() ).c_str() );
+		AfxMessageBox( Common::ToWString( options.help() ).c_str() );
 		exit( 0 );
 	}
 
-	CString regex_search = FXString::ToWString(arg_result["regex"].as<string>()).c_str();
-	CString regex_replace = FXString::ToWString( arg_result["regex_replace"].as<string>() ).c_str();
-	CString Sample = FXString::ToWString( arg_result["sample_text"].as<string>() ).c_str() ;
+	CString regex_search = Common::ToWString(arg_result["regex"].as<string>()).c_str();
+	CString regex_replace = Common::ToWString( arg_result["regex_replace"].as<string>() ).c_str();
+	CString Sample = Common::ToWString( arg_result["sample_text"].as<string>() ).c_str() ;
 	SampleLoadMethod sampleloadmethod = SampleLoadDefault;
 	int MonitorToDisplay = arg_result["monitor_no"].as<int>();
-	CString SampleFileName = FXString::ToWString( arg_result["file"].as<string>() ).c_str();
+	CString SampleFileName = Common::ToWString( arg_result["file"].as<string>() ).c_str();
 	bool ClipboardSampleLoad = arg_result["clipboard"].as<bool>();
 	Regex_Compatibility regex_compatibility = REGEX_COMPATIBILITY_SCINTILLA_POSIX;
 

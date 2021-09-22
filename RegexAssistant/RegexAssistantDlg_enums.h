@@ -10,8 +10,9 @@ enum Regex_Compatibility
 	REGEX_COMPATIBILITY_BOOST_ALL_STANDARD,			   
 	REGEX_COMPATIBILITY_BOOST_ALL_MULTILINE,		   
 	REGEX_COMPATIBILITY_BOOST_PERL_MULTILINE,		   
-	REGEX_COMPATIBILITY_CPP,					    // Use C++ Regex default,
-	REGEX_COMPATIBILITY_ECMAScript,					// Use boost all,
+	REGEX_COMPATIBILITY_ECMAScript,					// Use C++ STD Regex ECMAScript,
+	REGEX_COMPATIBILITY_CPP_BASIC,				    // Use C++ STD Regex Basic,
+	REGEX_COMPATIBILITY_CPP_EXT,				    // Use C++ STD Regex Extended,
 	REGEX_COMPATIBILITY_GROOVY,						// Use Java regex,
 	REGEX_COMPATIBILITY_JAVA,						// Try implementing java code in this application, or do conversions with boost all,
 	REGEX_COMPATIBILITY_JAVASCRIPT,				    // Use boost Perl,
@@ -38,13 +39,13 @@ enum Regex_Compatibility
 	//REGEX_COMPATIBILITY_COMMON,				         //Use boost all,
 	//REGEX_COMPATIBILITY_BOOST_PERL_STANDARD,		   
 	//REGEX_COMPATIBILITY_UNIX_OLD,					// Use Sentilla default,
-#ifdef _DEBUG										   
-	REGEX_COMPATIBILITY_DUMMY1,						// Dummy enums for testing purposes
-	REGEX_COMPATIBILITY_DUMMY2,						// Dummy enums for testing purposes
-	REGEX_COMPATIBILITY_DUMMY3,						// Dummy enums for testing purposes
-	REGEX_COMPATIBILITY_DUMMY4,						// Dummy enums for testing purposes
-	REGEX_COMPATIBILITY_DUMMY5,						// Dummy enums for testing purposes
-#endif												   
+//#ifdef _DEBUG										   
+//	REGEX_COMPATIBILITY_DUMMY1,						// Dummy enums for testing purposes
+//	REGEX_COMPATIBILITY_DUMMY2,						// Dummy enums for testing purposes
+//	REGEX_COMPATIBILITY_DUMMY3,						// Dummy enums for testing purposes
+//	REGEX_COMPATIBILITY_DUMMY4,						// Dummy enums for testing purposes
+//	REGEX_COMPATIBILITY_DUMMY5,						// Dummy enums for testing purposes
+//#endif												   
 													   
 	REGEX_COMPATIBILITY_Z						    // Place holder
 };													   
@@ -75,8 +76,12 @@ enum
 	REGEX_SUBSET_POSIX = REGEX_SUBSET_SED * 2,
 
 	REGEX_SUBSET_DOLLAR_PREFIX_ONLY = REGEX_SUBSET_POSIX * 2,
-	REGEX_SUBSET_BACKSLASH_PREFIX_ONLY = REGEX_SUBSET_DOLLAR_PREFIX_ONLY * 2
+	REGEX_SUBSET_BACKSLASH_PREFIX_ONLY = REGEX_SUBSET_DOLLAR_PREFIX_ONLY * 2,
+	REGEX_SUBSET_STD_REGEX_EXT = REGEX_SUBSET_BACKSLASH_PREFIX_ONLY * 2,
+	REGEX_SUBSET_STD_REGEX_BASIC = REGEX_SUBSET_STD_REGEX_EXT * 2,
 };
 
-#define REPORT_ERR_AND_EXIT(exit_err_no, msg_format, ...) {CString msg; msg.Format(_T("Error:  " msg_format "  Performming early exit due to error."),__VA_ARGS__);AfxMessageBox(msg);exit(exit_err_no);}
+enum SampleLoadMethod { SampleLoadDefault, SampleLoadFromCommandLine, SampleLoadFromFile, SampleLoadFromClipboard };
+
+
 
