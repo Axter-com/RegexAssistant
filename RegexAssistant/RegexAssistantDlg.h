@@ -91,8 +91,6 @@ protected:
 	void ChangeRegexEditBox_BodyMethod( CString MarkString );
 	void RegexReplace_Scintilla( CString MarkString, CString NeedleReplacementCstr );
 	void RegexReplace_BodyMethod( CString MarkString, CString NeedleReplacementCstr );
-	//void RegexReplace_LineByLine( CString MarkString, CString NeedleReplacementCstr );
-	//void ChangeRegexEditBox_LineByLine( CString MarkString );
 	void FetchTextForUndoArray();
 	void PopulateTokenList();
 	void CreateSizeGrip();
