@@ -4,7 +4,7 @@
 [![All Releases](https://img.shields.io/github/downloads/David-Maisonave/RegexAssistant/total.svg)](https://github.com/David-Maisonave/RegexAssistant/releases/latest)
 
 RegexAssistant is an open source Regular Expression (Regex) find and replace tool for Windows. 
-It has an easy to use UI that can build and test regex, and the results are seen real time as expression is typed into the GUI.
+It has an easy to use UI that can build and test regex, and the results are seen in real time as expressions are typed into the GUI.
 It has a cheat-sheet token window which list the main regex tokens and common patterns. Items in the token list can be inserted into the Expression (regex) field by double clicking the desired token.
 
 ## Downloads
